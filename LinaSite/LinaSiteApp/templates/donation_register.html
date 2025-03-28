@@ -1,0 +1,593 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заполнение информации из анкеты донора</title>
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            height: 100vh;
+            background-color: #F8F8F8;
+        }
+        .side-menu {
+            width: 130px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-first-last {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img, .side-menu-item-first-last img {
+            width: 30px;
+            height: 30px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: normal;
+        }
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .left-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        .center-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        .right-column {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .form-label {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+            display: block;
+        }
+        .select-container {
+            width: 100%;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .select-container select, .text-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            appearance: none;
+            background-color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .select-container::after {
+            content: "▼";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+            font-size: 10px;
+        }
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .components-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .component-option {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .component-option.selected {
+            background-color: #E60012;
+            color: white;
+            border-color: #E60012;
+        }
+        .radio-card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .radio-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            position: relative;
+        }
+        .radio-card.selected {
+            border-color: #E60012;
+        }
+        .radio-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        .radio-card-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .radio-custom-circle {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .radio-card.selected .radio-custom-circle {
+            border-color: #E60012;
+        }
+        .radio-card.selected .radio-custom-circle::after {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 10px;
+            height: 10px;
+            background-color: #E60012;
+            border-radius: 50%;
+        }
+        .radio-card-desc {
+            font-size: 12px;
+            color: #666;
+            margin-left: 30px;
+        }
+        .arrow-icon {
+            color: #E60012;
+            font-size: 20px;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 2px solid #E60012;
+        }
+        .date-picker {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last">
+            <img src="{% static 'menu/1.svg' %}" alt="Логотип">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/2.svg' %}" alt="Меню 1">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/3.svg' %}" alt="Меню 2">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/4.svg' %}" alt="Меню 3">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/5.svg' %}" alt="Меню 4">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/6.svg' %}" alt="Меню 5">
+        </div>
+        <div class="side-menu-item-first-last">
+            <img src="{% static 'menu/7.svg' %}" alt="Меню 6">
+        </div>
+    </div>
+    
+    <div class="content">
+        <h1>Заполнение информации из анкеты донора</h1>
+        
+        <form id="donation-form" method="post" action="{% url 'donation_register' %}">
+            {% csrf_token %}
+            <div class="main-container">
+                <div class="left-column">
+                    <div class="form-group">
+                        <label class="form-label">Дата предполагаемой донации</label>
+                        <input type="date" name="donation_date" class="date-picker" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Донор</label>
+                        <div class="select-container">
+                            <select id="donor-select" name="donor" required>
+                                <option value="">Выберите донора</option>
+                                {% for donor in donors %}
+                                    <option value="{{ donor.id }}">{{ donor.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="first-donation" name="is_first_donation">
+                            <label for="first-donation">Донор пришел в первый раз</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Номер документа, удостоверяющего личность</label>
+                        <input type="text" id="document-number" name="document_number" class="text-input">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="documents-changed" name="documents_changed">
+                            <label for="documents-changed">Документы были изменены</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Номер СНИЛС</label>
+                        <input type="text" id="snils" name="snils" class="text-input" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Адрес регистрации донора</label>
+                        <div class="select-container">
+                            <input type="text" id="donor-address" name="donor_address" class="text-input" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Адрес проведения донации</label>
+                        <div class="select-container">
+                            <input type="text" id="donation-address" name="donation_address" class="text-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="center-column">
+                    <div class="form-group">
+                        <label class="form-label">Выберите тип донации</label>
+                        <div class="components-grid">
+                            <div class="component-option" data-component="whole_blood">
+                                <span style="background-color: #E60012; width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+                                Цельная кровь
+                            </div>
+                            <div class="component-option" data-component="plasma">
+                                <span style="background-color: #FFD700; width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+                                Плазма
+                            </div>
+                            <div class="component-option" data-component="platelets">
+                                <span style="background-color: #FFA500; width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+                                Тромбоциты
+                            </div>
+                            <div class="component-option" data-component="erythrocytes">
+                                <span style="background-color: #800080; width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+                                Эритроциты
+                            </div>
+                            <div class="component-option" data-component="granulocytes">
+                                <span style="background-color: #0000FF; width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+                                Гранулоциты
+                            </div>
+                        </div>
+                        <input type="hidden" id="donation-type" name="donation_type" value="">
+                        <input type="hidden" id="components" name="components" value="">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Тип донации</label>
+                        <div class="radio-card-container">
+                            <label class="radio-card" for="payment-free">
+                                <input type="radio" id="payment-free" name="payment_type" value="free" checked>
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Безвозмездно
+                                </div>
+                                <div class="radio-card-desc">
+                                    Питание или компенсация питания (5% МРОТ порядка 700-1500 ₽. Учитывается при получении звания Почетного донора)
+                                </div>
+                            </label>
+                            
+                            <label class="radio-card" for="payment-paid">
+                                <input type="radio" id="payment-paid" name="payment_type" value="paid">
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Платно
+                                </div>
+                                <div class="radio-card-desc">
+                                    Деньги или социальная поддержка. Не учитывается при получении звания почетного донора
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Место сдачи</label>
+                        <div class="radio-card-container">
+                            <label class="radio-card" for="location-station">
+                                <input type="radio" id="location-station" name="donation_location" value="station" checked>
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Стационарный пункт
+                                </div>
+                                <div class="radio-card-desc">
+                                    Центр крови или станция переливания в городе
+                                </div>
+                            </label>
+                            
+                            <label class="radio-card" for="location-mobile">
+                                <input type="radio" id="location-mobile" name="donation_location" value="mobile">
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Выездная акция
+                                </div>
+                                <div class="radio-card-desc">
+                                    День донора, выезды в ВУЗы, передвижные мобильные бригады
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-column">
+                    <div class="form-group">
+                        <label class="form-label">Есть ли у донора противопоказания?</label>
+                        <div class="radio-card-container">
+                            <label class="radio-card" for="contraindications-present">
+                                <input type="radio" id="contraindications-present" name="contraindications" value="present">
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Противопоказания присутствуют
+                                </div>
+                                <div class="radio-card-desc">
+                                    Плохое самочувствие/операции/употребление алкоголя и т.д.
+                                </div>
+                            </label>
+                            
+                            <label class="radio-card" for="contraindications-absent">
+                                <input type="radio" id="contraindications-absent" name="contraindications" value="absent" checked>
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Противопоказания отсутствуют
+                                </div>
+                                <div class="radio-card-desc">
+                                    Самочувствие донора хорошее, сроки соблюдены
+                                </div>
+                            </label>
+                            
+                            <label class="radio-card" for="contraindications-unknown">
+                                <input type="radio" id="contraindications-unknown" name="contraindications" value="unknown">
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Затрудняюсь ответить
+                                </div>
+                                <div class="radio-card-desc">
+                                    Самочувствие донора хорошее, однако есть сомнения
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Необходимость выдачи направлений</label>
+                        <div class="radio-card-container">
+                            <label class="radio-card" for="directions-required">
+                                <input type="radio" id="directions-required" name="directions_needed" value="required">
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Направления необходимы
+                                </div>
+                                <div class="radio-card-desc">
+                                    Прошел срок действия предыдущих медицинских исследований
+                                </div>
+                                <div class="arrow-icon">›</div>
+                            </label>
+                            
+                            <label class="radio-card" for="directions-not-required">
+                                <input type="radio" id="directions-not-required" name="directions_needed" value="not_required" checked>
+                                <div class="radio-card-title">
+                                    <span class="radio-custom-circle"></span>
+                                    Направления не нужны
+                                </div>
+                                <div class="radio-card-desc">
+                                    Все медицинские исследования актуальны
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="button button-primary">Применить</button>
+                    <button type="reset" class="button button-secondary">Сбросить</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация компонентов
+            const donorSelect = document.getElementById('donor-select');
+            const snilsField = document.getElementById('snils');
+            const documentNumberField = document.getElementById('document-number');
+            const donorAddressField = document.getElementById('donor-address');
+            const donationTypeField = document.getElementById('donation-type');
+            const componentsField = document.getElementById('components');
+            
+            // Компоненты крови
+            const componentOptions = document.querySelectorAll('.component-option');
+            componentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    updateSelectedComponents();
+                });
+            });
+            
+            function updateSelectedComponents() {
+                const selectedComponents = [];
+                document.querySelectorAll('.component-option.selected').forEach(comp => {
+                    selectedComponents.push(comp.dataset.component);
+                });
+                
+                // Устанавливаем первый выбранный компонент как тип донации
+                if (selectedComponents.length > 0) {
+                    donationTypeField.value = selectedComponents[0];
+                } else {
+                    donationTypeField.value = '';
+                }
+                
+                // Устанавливаем все выбранные компоненты
+                componentsField.value = JSON.stringify(selectedComponents);
+            }
+            
+            // Радио-карточки
+            const radioCards = document.querySelectorAll('.radio-card');
+            radioCards.forEach(card => {
+                const radio = card.querySelector('input[type="radio"]');
+                
+                // Установка начального состояния
+                if (radio.checked) {
+                    card.classList.add('selected');
+                }
+                
+                radio.addEventListener('change', function() {
+                    // Сначала удаляем класс selected у всех карточек в группе
+                    const name = this.getAttribute('name');
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                        const parentCard = r.closest('.radio-card');
+                        parentCard.classList.remove('selected');
+                    });
+                    
+                    // Затем добавляем класс выбранной карточке
+                    if (this.checked) {
+                        card.classList.add('selected');
+                    }
+                });
+            });
+            
+            // Автозаполнение информации о доноре при выборе из списка
+            donorSelect.addEventListener('change', function() {
+                const donorId = this.value;
+                if (!donorId) {
+                    // Очищаем поля если донор не выбран
+                    snilsField.value = '';
+                    documentNumberField.value = '';
+                    donorAddressField.value = '';
+                    return;
+                }
+                
+                // Запрашиваем информацию о доноре через API
+                fetch(`/api/donor/${donorId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            snilsField.value = data.snils || '';
+                            documentNumberField.value = data.document_number || '';
+                            donorAddressField.value = data.address || '';
+                        } else {
+                            alert('Ошибка при получении данных донора');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при запросе данных');
+                    });
+            });
+            
+            // Обработка формы
+            const donationForm = document.getElementById('donation-form');
+            donationForm.addEventListener('submit', function(event) {
+                // Проверяем, что хотя бы один компонент выбран
+                if (document.querySelectorAll('.component-option.selected').length === 0) {
+                    alert('Пожалуйста, выберите хотя бы один тип донации');
+                    event.preventDefault();
+                    return;
+                }
+                
+                // Дополнительные проверки можно добавить здесь
+            });
+        });
+    </script>
+</body>
+</html>

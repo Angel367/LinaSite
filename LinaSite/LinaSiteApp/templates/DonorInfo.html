@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о доноре</title>
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            height: 100vh;
+            background-color: #F8F8F8;
+        }
+        .side-menu {
+            width: 160px;
+            {#height: 100vh; /* Занимает всю высоту экрана */#}
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .option {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .option label {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 2px solid #D3D3D3;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .option input[type="radio"]:checked + span {
+            border-color: transparent;
+        }
+        .option input[type="radio"]:checked ~ .selected-border {
+            border-color: #E60012;
+        }
+        .option span {
+            flex-grow: 1;
+            text-align: left;
+            padding: 15px;
+            border: 2px solid transparent;
+        }
+        .selected-border {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px solid #D3D3D3;
+            border-radius: 10px;
+            pointer-events: none;
+            transition: border-color 0.3s ease;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .button {
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 2px solid #E60012;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7">
+        </div>
+    </div>
+    <div class="content">
+        <div class="card">
+            <h2>Укажите, что вы хотите сделать</h2>
+            <div class="option">
+                <label>
+                    <input type="radio" name="action" checked>
+                    <span>Внести информацию о пришедшем доноре</span>
+                    <div class="selected-border"></div>
+                </label>
+                <label>
+                    <input type="radio" name="action">
+                    <span>Просмотреть информацию о донорах</span>
+                    <div class="selected-border"></div>
+                </label>
+            </div>
+            <div class="buttons">
+                <button class="button button-primary">Применить</button>
+                <button class="button button-secondary">Сбросить</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

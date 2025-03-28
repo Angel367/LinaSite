@@ -1,0 +1,551 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск доноров</title>
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            height: 100vh;
+            background-color: #F8F8F8;
+        }
+        .side-menu {
+            width: 130px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-first-last {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img, .side-menu-item-first-last img {
+            width: 30px;
+            height: 30px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px 30px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: normal;
+        }
+        .main-container {
+            display: flex;
+            gap: 30px;
+        }
+        .left-column {
+            flex: 0 0 45%;
+        }
+        .right-column {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 12px 15px;
+            margin-bottom: 15px;
+        }
+        .filter-title {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+        .select-container {
+            width: 100%;
+            position: relative;
+        }
+        .select-container select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            appearance: none;
+            background-color: white;
+            font-size: 14px;
+        }
+        .select-container::after {
+            content: "▼";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+            font-size: 10px;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        .radio-custom {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+        }
+        .radio-option input[type="radio"]:checked + .radio-custom::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 10px;
+            height: 10px;
+            background-color: #E60012;
+            border-radius: 50%;
+        }
+        .radio-option input[type="radio"]:checked + .radio-custom {
+            border-color: #E60012;
+        }
+        .text-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .component-option {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .component-option.selected {
+            background-color: rgba(230, 0, 18, 0.7);
+            color: white;
+            border-color: #E60012;
+        }
+        .component-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 8px;
+            border-radius: 50%;
+        }
+        .button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 2px solid #E60012;
+        }
+        .donor-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .donor-card:hover {
+            transform: translateY(-2px);
+        }
+        .donor-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .donor-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        .donor-blood {
+            color: #777;
+            font-size: 13px;
+        }
+        .donor-status {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .donor-status-badge {
+            display: inline-block;
+            background-color: #FFF9C4;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .donor-status-badge.not-regular {
+            background-color: rgba(230, 0, 18, 0.1);
+            color: #E60012;
+        }
+        .donor-donation-count {
+            color: #777;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .donor-components {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .component-pill {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 11px;
+            background-color: #f7f7f7;
+            border: 1px solid #e0e0e0;
+        }
+        .component-pill .component-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .arrow-right {
+            color: #E60012;
+            font-size: 24px;
+            margin-left: 15px;
+        }
+        .results-container {
+            margin-top: 20px;
+        }
+        .error-message {
+            color: #777;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last">
+            <img src="{% static 'menu/1.svg' %}" alt="Логотип">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/2.svg' %}" alt="Меню 1">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/3.svg' %}" alt="Меню 2">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/4.svg' %}" alt="Меню 3">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/5.svg' %}" alt="Меню 4">
+        </div>
+        <div class="side-menu-item">
+            <img src="{% static 'menu/6.svg' %}" alt="Меню 5">
+        </div>
+        <div class="side-menu-item-first-last">
+            <img src="{% static 'menu/7.svg' %}" alt="Меню 6">
+        </div>
+    </div>
+    
+    <div class="content">
+        <h1>Поиск доноров</h1>
+        
+        <div class="main-container">
+            <div class="left-column">
+                <div class="filter-group">
+                    <div class="filter-title">Группа крови</div>
+                    <div class="select-container">
+                        <select id="blood-group">
+                            <option value="">Выберите группу крови</option>
+                            <option value="O-">O-</option>
+                            <option value="O+">O+</option>
+                            <option value="A-">A-</option>
+                            <option value="A+">A+</option>
+                            <option value="B-">B-</option>
+                            <option value="B+">B+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="AB+">AB+</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-title">Rh-фактор</div>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="rh-factor" value="+">
+                            <span class="radio-custom"></span>
+                            Положительный
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="rh-factor" value="-">
+                            <span class="radio-custom"></span>
+                            Отрицательный
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="rh-factor" value="any" checked>
+                            <span class="radio-custom"></span>
+                            Любой
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-title">Kell-фактор</div>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="kell-factor" value="+">
+                            <span class="radio-custom"></span>
+                            Положительный
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="kell-factor" value="-">
+                            <span class="radio-custom"></span>
+                            Отрицательный
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="kell-factor" value="any" checked>
+                            <span class="radio-custom"></span>
+                            Любой
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-title">ФИО</div>
+                    <input type="text" id="donor-name" class="text-input" placeholder="Введите ФИО донора">
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-title">Компонент крови</div>
+                    <div class="components-grid">
+                        <div class="component-option" data-component="Цельная кровь">
+                            <span class="component-color" style="background-color: #E60012;"></span>
+                            Цельная кровь
+                        </div>
+                        <div class="component-option" data-component="Плазма">
+                            <span class="component-color" style="background-color: #FFD700;"></span>
+                            Плазма
+                        </div>
+                        <div class="component-option" data-component="Тромбоциты">
+                            <span class="component-color" style="background-color: #FFA500;"></span>
+                            Тромбоциты
+                        </div>
+                        <div class="component-option" data-component="Эритроциты">
+                            <span class="component-color" style="background-color: #800080;"></span>
+                            Эритроциты
+                        </div>
+                        <div class="component-option" data-component="Гранулоциты">
+                            <span class="component-color" style="background-color: #0000FF;"></span>
+                            Гранулоциты
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <button id="search-button" class="button button-primary">Применить</button>
+                <button id="reset-button" class="button button-secondary">Сбросить</button>
+                
+                <div id="results-container" class="results-container">
+                    <!-- Результаты поиска будут добавлены здесь через JavaScript -->
+                </div>
+                
+                <div id="error-message" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Компоненты крови
+            const componentOptions = document.querySelectorAll('.component-option');
+            componentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+            
+            // Поиск доноров
+            const searchButton = document.getElementById('search-button');
+            const resetButton = document.getElementById('reset-button');
+            const resultsContainer = document.getElementById('results-container');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Цвета для компонентов крови
+            const componentColors = {
+                'Цельная кровь': '#E60012',
+                'Плазма': '#FFD700',
+                'Тромбоциты': '#FFA500',
+                'Эритроциты': '#800080',
+                'Гранулоциты': '#0000FF'
+            };
+            
+            searchButton.addEventListener('click', function() {
+                const bloodGroup = document.getElementById('blood-group').value;
+                const rhFactor = document.querySelector('input[name="rh-factor"]:checked').value;
+                const kellFactor = document.querySelector('input[name="kell-factor"]:checked').value;
+                const donorName = document.getElementById('donor-name').value;
+                
+                const selectedComponents = [];
+                document.querySelectorAll('.component-option.selected').forEach(comp => {
+                    selectedComponents.push(comp.dataset.component);
+                });
+                
+                // Отправка AJAX-запроса
+                const formData = new FormData();
+                formData.append('blood_group', bloodGroup);
+                formData.append('rh_factor', rhFactor);
+                formData.append('kell_factor', kellFactor);
+                formData.append('name', donorName);
+                selectedComponents.forEach(component => {
+                    formData.append('components[]', component);
+                });
+                
+                fetch('{% url "donor_search" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultsContainer.innerHTML = '';
+                    errorMessage.textContent = '';
+                    
+                    if (data.donors.length === 0) {
+                        errorMessage.textContent = 'Доноры не найдены';
+                        return;
+                    }
+                    
+                    data.donors.forEach(donor => {
+                        const donorCard = document.createElement('div');
+                        donorCard.className = 'donor-card';
+                        
+                        // Создаем компоненты крови в виде пилюль
+                        let componentPills = '';
+                        if (donor.components && donor.components.length > 0) {
+                            donor.components.slice(0, 2).forEach(comp => {
+                                componentPills += `
+                                    <div class="component-pill">
+                                        <span class="component-dot" style="background-color: ${componentColors[comp]}"></span>
+                                        ${comp}
+                                    </div>
+                                `;
+                            });
+                        }
+                        
+                        donorCard.innerHTML = `
+                            <div class="donor-info">
+                                <div class="donor-name">${donor.full_name}</div>
+                                <div class="donor-blood">${donor.blood_info}</div>
+                            </div>
+                            <div class="donor-status">
+                                <span class="donor-status-badge ${!donor.is_regular ? 'not-regular' : ''}">
+                                    ${donor.is_regular ? 'Штатный донор' : 'Не штатный донор'}
+                                </span>
+                                <div class="donor-donation-count">донации: ${donor.donation_count}</div>
+                                <div class="donor-components">
+                                    ${componentPills}
+                                </div>
+                            </div>
+                            <div class="arrow-right">›</div>
+                        `;
+                        donorCard.addEventListener('click', function() {
+                            window.location.href = `/donor/${donor.id}/`;
+                        });
+                        resultsContainer.appendChild(donorCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    errorMessage.textContent = 'Произошла ошибка при поиске доноров';
+                });
+            });
+            
+            // Сброс формы
+            resetButton.addEventListener('click', function() {
+                document.getElementById('blood-group').value = '';
+                document.querySelector('input[name="rh-factor"][value="any"]').checked = true;
+                document.querySelector('input[name="kell-factor"][value="any"]').checked = true;
+                document.getElementById('donor-name').value = '';
+                
+                document.querySelectorAll('.component-option.selected').forEach(comp => {
+                    comp.classList.remove('selected');
+                });
+                
+                resultsContainer.innerHTML = '';
+                errorMessage.textContent = '';
+            });
+        });
+    </script>
+</body>
+</html>
