@@ -5,19 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Заполнение информации из анкеты донора</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
     <style>
         html {
             height: 100%;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             display: flex;
             margin: 0;
             height: 100vh;
             background-color: #F8F8F8;
         }
         .side-menu {
-            width: 130px;
+            width: 160px;
             background-color: #D9D9D9;
             display: flex;
             flex-direction: column;
@@ -26,8 +27,8 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
         .side-menu-item {
-            width: 60px;
-            height: 60px;
+            width: 70%;
+            height: 90%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -37,9 +38,9 @@
             transition: background-color 0.3s ease;
             background-color: white;
         }
-        .side-menu-item-first-last {
-            width: 60px;
-            height: 60px;
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,13 +48,27 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
         }
         .side-menu-item:hover {
             background-color: #F0F0F0;
         }
-        .side-menu-item img, .side-menu-item-first-last img {
-            width: 30px;
-            height: 30px;
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
         }
         .content {
             flex-grow: 1;
@@ -209,7 +224,7 @@
         }
         .arrow-icon {
             color: #E60012;
-            font-size: 20px;
+            font-size: 50px;
             position: absolute;
             right: 15px;
             top: 50%;
@@ -247,26 +262,26 @@
 </head>
 <body>
     <div class="side-menu">
-        <div class="side-menu-item-first-last">
-            <img src="{% static 'menu/1.svg' %}" alt="Логотип">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/2.svg' %}" alt="Меню 1">
+        <div class="side-menu-item-active" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/3.svg' %}" alt="Меню 2">
+        <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/4.svg' %}" alt="Меню 3">
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/5.svg' %}" alt="Меню 4">
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/6.svg' %}" alt="Меню 5">
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
         </div>
-        <div class="side-menu-item-first-last">
-            <img src="{% static 'menu/7.svg' %}" alt="Меню 6">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
         </div>
     </div>
     
@@ -455,14 +470,14 @@
                         <div class="radio-card-container">
                             <label class="radio-card" for="directions-required">
                                 <input type="radio" id="directions-required" name="directions_needed" value="required">
-                                <div class="radio-card-title">
+                                <div class="radio-card-title" onclick="window.location.href=`/app/external-direction/create/`">
                                     <span class="radio-custom-circle"></span>
                                     Направления необходимы
                                 </div>
                                 <div class="radio-card-desc">
                                     Прошел срок действия предыдущих медицинских исследований
                                 </div>
-                                <div class="arrow-icon">›</div>
+                                <div class="arrow-icon"  onclick="window.location.href=`/app/external-direction/create/`">›</div>
                             </label>
                             
                             <label class="radio-card" for="directions-not-required">
@@ -485,109 +500,109 @@
         </form>
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация компонентов
-            const donorSelect = document.getElementById('donor-select');
-            const snilsField = document.getElementById('snils');
-            const documentNumberField = document.getElementById('document-number');
-            const donorAddressField = document.getElementById('donor-address');
-            const donationTypeField = document.getElementById('donation-type');
-            const componentsField = document.getElementById('components');
-            
-            // Компоненты крови
-            const componentOptions = document.querySelectorAll('.component-option');
-            componentOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    this.classList.toggle('selected');
-                    updateSelectedComponents();
-                });
-            });
-            
-            function updateSelectedComponents() {
-                const selectedComponents = [];
-                document.querySelectorAll('.component-option.selected').forEach(comp => {
-                    selectedComponents.push(comp.dataset.component);
-                });
-                
-                // Устанавливаем первый выбранный компонент как тип донации
-                if (selectedComponents.length > 0) {
-                    donationTypeField.value = selectedComponents[0];
-                } else {
-                    donationTypeField.value = '';
-                }
-                
-                // Устанавливаем все выбранные компоненты
-                componentsField.value = JSON.stringify(selectedComponents);
-            }
-            
-            // Радио-карточки
-            const radioCards = document.querySelectorAll('.radio-card');
-            radioCards.forEach(card => {
-                const radio = card.querySelector('input[type="radio"]');
-                
-                // Установка начального состояния
-                if (radio.checked) {
-                    card.classList.add('selected');
-                }
-                
-                radio.addEventListener('change', function() {
-                    // Сначала удаляем класс selected у всех карточек в группе
-                    const name = this.getAttribute('name');
-                    document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
-                        const parentCard = r.closest('.radio-card');
-                        parentCard.classList.remove('selected');
-                    });
-                    
-                    // Затем добавляем класс выбранной карточке
-                    if (this.checked) {
-                        card.classList.add('selected');
-                    }
-                });
-            });
-            
-            // Автозаполнение информации о доноре при выборе из списка
-            donorSelect.addEventListener('change', function() {
-                const donorId = this.value;
-                if (!donorId) {
-                    // Очищаем поля если донор не выбран
-                    snilsField.value = '';
-                    documentNumberField.value = '';
-                    donorAddressField.value = '';
-                    return;
-                }
-                
-                // Запрашиваем информацию о доноре через API
-                fetch(`/api/donor/${donorId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            snilsField.value = data.snils || '';
-                            documentNumberField.value = data.document_number || '';
-                            donorAddressField.value = data.address || '';
-                        } else {
-                            alert('Ошибка при получении данных донора');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка:', error);
-                        alert('Произошла ошибка при запросе данных');
-                    });
-            });
-            
-            // Обработка формы
-            const donationForm = document.getElementById('donation-form');
-            donationForm.addEventListener('submit', function(event) {
-                // Проверяем, что хотя бы один компонент выбран
-                if (document.querySelectorAll('.component-option.selected').length === 0) {
-                    alert('Пожалуйста, выберите хотя бы один тип донации');
-                    event.preventDefault();
-                    return;
-                }
-                
-                // Дополнительные проверки можно добавить здесь
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Инициализация компонентов
+        const donorSelect = document.getElementById('donor-select');
+        const snilsField = document.getElementById('snils');
+        const documentNumberField = document.getElementById('document-number');
+        const donorAddressField = document.getElementById('donor-address');
+        const donationTypeField = document.getElementById('donation-type');
+        const componentsField = document.getElementById('components');
+
+        // Компоненты крови
+        const componentOptions = document.querySelectorAll('.component-option');
+        componentOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateSelectedComponents();
             });
         });
-    </script>
+
+        function updateSelectedComponents() {
+            const selectedComponents = [];
+            document.querySelectorAll('.component-option.selected').forEach(comp => {
+                selectedComponents.push(comp.dataset.component);
+            });
+
+            // Устанавливаем первый выбранный компонент как тип донации
+            if (selectedComponents.length > 0) {
+                donationTypeField.value = selectedComponents[0];
+            } else {
+                donationTypeField.value = '';
+            }
+
+            // Устанавливаем все выбранные компоненты как JSON-строку
+            componentsField.value = JSON.stringify(selectedComponents);
+        }
+
+        // Радио-карточки
+        const radioCards = document.querySelectorAll('.radio-card');
+        radioCards.forEach(card => {
+            const radio = card.querySelector('input[type="radio"]');
+
+            // Установка начального состояния
+            if (radio.checked) {
+                card.classList.add('selected');
+            }
+
+            radio.addEventListener('change', function() {
+                // Сначала удаляем класс selected у всех карточек в группе
+                const name = this.getAttribute('name');
+                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                    const parentCard = r.closest('.radio-card');
+                    parentCard.classList.remove('selected');
+                });
+
+                // Затем добавляем класс выбранной карточке
+                if (this.checked) {
+                    card.classList.add('selected');
+                }
+            });
+        });
+
+        // Автозаполнение информации о доноре при выборе из списка
+        donorSelect.addEventListener('change', function() {
+            const donorId = this.value;
+            if (!donorId) {
+                // Очищаем поля если донор не выбран
+                snilsField.value = '';
+                documentNumberField.value = '';
+                donorAddressField.value = '';
+                return;
+            }
+
+            // Запрашиваем информацию о доноре через API
+            fetch(`/app/api/donor/${donorId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        snilsField.value = data.snils || '';
+                        documentNumberField.value = data.document_number || '';
+                        donorAddressField.value = data.address || '';
+                    } else {
+                        alert('Ошибка при получении данных донора');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при запросе данных');
+                });
+        });
+
+        // Обработка формы
+        const donationForm = document.getElementById('donation-form');
+        donationForm.addEventListener('submit', function(event) {
+            // Проверяем, что хотя бы один компонент выбран
+            if (document.querySelectorAll('.component-option.selected').length === 0) {
+                alert('Пожалуйста, выберите хотя бы один тип донации');
+                event.preventDefault();
+                return;
+            }
+
+            // Дополнительные проверки можно добавить здесь
+        });
+    });
+</script>
 </body>
 </html>

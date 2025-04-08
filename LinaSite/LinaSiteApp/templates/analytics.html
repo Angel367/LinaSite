@@ -1,0 +1,362 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитика</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+        body {
+            display: flex;
+        }
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+.dashboard {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    gap: 20px;
+}
+
+.dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .chart-area {
+            width: 100%;
+            height: 250px;
+            position: relative;
+        }
+        .chart-area canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        /* Стили для кругового индикатора */
+        .semi-donut {
+            --percentage: 0;
+            --fill: #FF2A23;
+            width: 200px;
+            height: 100px;
+            position: relative;
+            border-radius: 100px 100px 0 0;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            box-sizing: border-box;
+            margin: 0 auto 30px;
+        }
+        .semi-donut::after {
+            content: '';
+            position: absolute;
+            width: 170px;
+            height: 85px;
+            border-radius: 85px 85px 0 0;
+            background: white;
+            top: 15px;
+        }
+        .semi-donut-fill {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #FF2A23;
+            transform-origin: center bottom;
+            transform: rotate(calc(1deg * (-180 + var(--percentage) * 1.8)));
+            transition: transform 0.5s ease;
+        }
+        .semi-donut-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: gray;
+            z-index: -1;
+        }
+        .semi-donut.donors {
+            --percentage: 62;
+        }
+        .semi-donut.approved {
+            --percentage: 80;
+        }
+        .full-donut {
+    --percentage: 0;
+    --fill: #FF2A23;
+    --bg: #ccc;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--fill) calc(var(--percentage) * 1%),
+        var(--bg) 0
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 0 auto 30px;
+}
+
+.full-donut::after {
+    content: '';
+    width: 140px;
+    height: 140px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 1;
+}
+
+.chart-title {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+}
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">Аналитика</h1>
+
+        <div class="dashboard">
+            <div class="chart-container">
+    <div class="full-donut" style="--percentage: 62;">
+        <!-- можно внутрь добавить текст, если нужно -->
+    </div>
+    <div class="chart-title">Доноров вернулось в течение 6 месяцев</div>
+</div>
+
+<div class="chart-container">
+    <div class="chart-area">
+        <canvas id="donations-chart"></canvas>
+    </div>
+    <div class="chart-title">Количество донаций</div>
+</div>
+
+<div class="chart-container">
+    <div class="full-donut" style="--percentage: 52;">
+        <!-- можно внутрь добавить текст, если нужно -->
+    </div>
+    <div class="chart-title">Доля допущенных доноров</div>
+</div>
+
+<div class="chart-container">
+    <div class="chart-area">
+        <canvas id="new-donors-chart"></canvas>
+    </div>
+    <div class="chart-title">Количество новых доноров в месяц</div>
+</div>
+    </div>
+
+    <script>
+        // Данные для графиков (статические, как запрошено)
+        const months = ['Июль 24', 'Авг 24', 'Сен 24', 'Окт 24', 'Нояб 24', 'Дек 24', 'Янв 25', 'Фев 25'];
+
+        // Данные для графика донаций
+        const donationsData = {
+            labels: months,
+            datasets: [{
+                label: 'Количество донаций',
+                data: [520, 650, 480, 530, 620, 380, 510, 680],
+                backgroundColor: '#FF2A23',
+                borderRadius: 5,
+                borderSkipped: false,
+                barThickness: 120
+            }]
+        };
+
+        // Данные для графика новых доноров
+        const newDonorsData = {
+            labels: months,
+            datasets: [{
+                label: 'Количество новых доноров',
+                data: [230, 380, 210, 260, 340, 180, 250, 360],
+                backgroundColor: '#FF2A23',
+                borderRadius: 5,
+                borderSkipped: false,
+                barThickness: 120
+            }]
+        };
+
+        // Общие настройки для графиков
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#333',
+                    bodyColor: '#333',
+                    borderColor: '#FF2A23',
+                    borderWidth: 3,
+                    displayColors: false,
+                    padding: 10,
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' шт.';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    }
+                }
+            }
+        };
+
+        // Инициализация графиков
+        document.addEventListener('DOMContentLoaded', function() {
+            // График донаций
+            new Chart(
+                document.getElementById('donations-chart').getContext('2d'),
+                {
+                    type: 'bar',
+                    data: donationsData,
+                    options: chartOptions
+                }
+            );
+
+            // График новых доноров
+            new Chart(
+                document.getElementById('new-donors-chart').getContext('2d'),
+                {
+                    type: 'bar',
+                    data: newDonorsData,
+                    options: chartOptions
+                }
+            );
+        });
+    </script>
+</body>
+</html>

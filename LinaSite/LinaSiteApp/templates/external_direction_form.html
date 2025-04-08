@@ -1,0 +1,436 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Внешнее направление</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+        body {
+            display: flex;
+        }
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+            font-weight: normal;
+        }
+        form {
+          display: flex;              /* Располагает элементы в ряд */
+          gap: 1rem;                  /* Равный отступ между элементами (можно изменить) */
+          width: 100%;                /* Занимает всё доступное место */
+        }
+        .form-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%
+        }
+        .form-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 65vh;
+            margin-right: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-label {
+            font-size: 14px;
+            color: #333;
+        }
+        .custom-select {
+            position: relative;
+        }
+        .custom-select select {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            appearance: none;
+            border: none;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #aaa;
+            pointer-events: none;
+        }
+        .text-input {
+            width: 100%;
+            height: 100px;
+            padding: 0 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .textarea-input {
+            width: 100%;
+            height: 215px;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+            box-sizing: border-box;
+            resize: none;
+        }
+        .buttons-container {
+            margin-top: 20px;
+            max-width: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+        .button {
+            width: 48vh;
+            height: 45px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            border: none;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 1px solid #E60012;
+        }
+        .button-tertiary {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .required-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+        /* Read-only styles */
+        .read-only-input {
+            background-color: #f9f9f9 !important;
+            cursor: not-allowed;
+        }
+        .read-only-notice {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .read-only-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='/app/direction-main/'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/logout'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Внешнее направление</h1>
+        </div>
+
+        {% if read_only %}
+        <div class="read-only-notice">
+            <p>Просмотр направления. Все поля доступны только для чтения.</p>
+        </div>
+        {% endif %}
+
+        <form id="external-direction-form" method="post" action="{% if not read_only %}{% url 'external_direction_create' %}{% endif %}">
+            {% csrf_token %}
+
+            <div class="form-layout">
+                <div class="form-left">
+                    <div class="form-group">
+                        <label class="form-label">Донор*</label>
+                        <div class="custom-select">
+                            <select id="donor-select" name="donor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Выберите донора</option>
+                                {% for donor in donors %}
+                                    <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Дата выдачи*</label>
+                        <div class="custom-select">
+                            <select id="issue-date" name="issue_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Выберите дату выдачи</option>
+                                {% for date in available_dates %}
+                                    <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.issue_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Дата начала действия*</label>
+                        <div class="custom-select">
+                            <select id="start-date" name="start_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Выберите дату начала</option>
+                                {% for date in available_dates %}
+                                    <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.start_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Дата завершения*</label>
+                        <div class="custom-select">
+                            <select id="end-date" name="end_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Выберите дату завершения</option>
+                                {% for date in expiry_dates %}
+                                    <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.end_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Тип исследования*</label>
+                        <div class="custom-select">
+                            <select id="research-type" name="research_type" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Выберите тип исследования</option>
+                                <option value="ecg" {% if direction and direction.research_type == 'ecg' %}selected{% endif %}>ЭКГ</option>
+                                <option value="self_sample" {% if direction and direction.research_type == 'self_sample' %}selected{% endif %}>Анализ самозаборных материалов</option>
+                                <option value="ent" {% if direction and direction.research_type == 'ent' %}selected{% endif %}>Осмотр у врача-оториноларинголога</option>
+                                <option value="blood_test" {% if direction and direction.research_type == 'blood_test' %}selected{% endif %}>Анализ крови</option>
+                                <option value="urine_test" {% if direction and direction.research_type == 'urine_test' %}selected{% endif %}>Анализ мочи</option>
+                                <option value="ultrasound" {% if direction and direction.research_type == 'ultrasound' %}selected{% endif %}>УЗИ</option>
+                                <option value="other" {% if direction and direction.research_type == 'other' %}selected{% endif %}>Другое</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p class="required-note">*поле обязательно для заполнения</p>
+                </div>
+
+                <div class="form-right">
+                    <div class="form-group">
+                        <label class="form-label">Адрес поликлиники</label>
+                        <input type="text" id="clinic-address" name="clinic_address" class="text-input {% if read_only %}read-only-input{% endif %}" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.clinic_address }}{% endif %}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Причина выдачи направления</label>
+                        <textarea id="issue-reason" name="issue_reason" class="textarea-input {% if read_only %}read-only-input{% endif %}" {% if read_only %}readonly{% endif %}>{% if direction %}{{ direction.issue_reason }}{% endif %}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regular buttons (hidden in read-only mode) -->
+            <div class="buttons-container {% if read_only %}read-only-hidden{% endif %}">
+                <button type="submit" class="button button-primary">Применить</button>
+                <button type="reset" id="reset-button" class="button button-secondary">Сбросить</button>
+                <a href="{% url 'direction_search' %}" class="button button-tertiary">Вернуться</a>
+            </div>
+
+            <!-- Back button (shown only in read-only mode) -->
+            {% if read_only %}
+            <div class="buttons-container">
+                <a href="{% url 'direction_search' %}" class="button button-primary">Вернуться к поиску</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if we're in read-only mode
+        const isReadOnly = {% if read_only %}true{% else %}false{% endif %};
+
+        // If we're in read-only mode, disable the form functionality
+        if (isReadOnly) {
+            // No need to initialize interactive elements in read-only mode
+            return;
+        }
+
+        // Инициализация компонентов
+        const donorSelect = document.getElementById('donor-select');
+        const issueDateSelect = document.getElementById('issue-date');
+        const startDateSelect = document.getElementById('start-date');
+        const endDateSelect = document.getElementById('end-date');
+        const resetButton = document.getElementById('reset-button');
+
+        // Обработка выбора даты выдачи - автоматически устанавливает дату начала действия на ту же дату
+        issueDateSelect.addEventListener('change', function() {
+            startDateSelect.value = this.value;
+
+            // Вычисляем дату завершения (+ 30 дней по умолчанию)
+            if (this.value) {
+                const issueDate = new Date(this.value);
+                const endDate = new Date(issueDate);
+                endDate.setDate(endDate.getDate() + 30);
+
+                // Находим ближайшую доступную дату для даты завершения
+                const endDateOptions = Array.from(endDateSelect.options).map(option => option.value);
+                let closestEndDate = null;
+                let minDiff = Number.MAX_SAFE_INTEGER;
+
+                endDateOptions.forEach(dateStr => {
+                    if (dateStr) {
+                        const date = new Date(dateStr);
+                        const diff = Math.abs(date - endDate);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closestEndDate = dateStr;
+                        }
+                    }
+                });
+
+                if (closestEndDate) {
+                    endDateSelect.value = closestEndDate;
+                }
+            }
+        });
+
+        // Обработка сброса формы
+        resetButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('external-direction-form').reset();
+        });
+
+        // Обработка отправки формы
+        const externalDirectionForm = document.getElementById('external-direction-form');
+        externalDirectionForm.addEventListener('submit', function(event) {
+            // Базовая валидация - проверка, что дата завершения позже даты начала
+            const startDate = new Date(startDateSelect.value);
+            const endDate = new Date(endDateSelect.value);
+
+            if (endDate <= startDate) {
+                alert('Дата завершения должна быть позже даты начала действия');
+                event.preventDefault();
+                return;
+            }
+        });
+    });
+</script>
+</body>
+</html>

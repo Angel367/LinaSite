@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск направлений</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+        body {
+            display: flex;
+        }
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 30px;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+            font-weight: normal;
+        }
+        .search-area {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .search-filters {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .search-results {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            margin-bottom: 5px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .custom-select {
+            position: relative;
+            height: 50px;
+            width: 100%;
+        }
+        .custom-select select {
+            display: block;
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            background-color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            appearance: none;
+            font-size: 14px;
+        }
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #aaa;
+            pointer-events: none;
+        }
+        .radio-container {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+        }
+        .custom-radio {
+            position: relative;
+            padding-left: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+        .custom-radio input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .radio-mark {
+            position: absolute;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+        }
+        .custom-radio input:checked ~ .radio-mark {
+            background-color: white;
+        }
+        .radio-mark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .custom-radio input:checked ~ .radio-mark:after {
+            display: block;
+            left: 5px;
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            background-color: #E60012;
+            border-radius: 50%;
+        }
+        .button {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            border: none;
+            margin-bottom: 10px;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 1px solid #E60012;
+        }
+        .direction-card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .direction-card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .direction-card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .direction-card-expiry {
+            font-size: 14px;
+            color: #777;
+        }
+        .direction-card-content {
+            display: flex;
+            gap: 20px;
+        }
+        .direction-card-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .direction-card-info-item {
+            display: flex;
+            gap: 10px;
+        }
+        .direction-card-info-label {
+            font-size: 14px;
+            color: #777;
+            min-width: 100px;
+        }
+        .direction-card-info-value {
+            font-size: 14px;
+            color: #333;
+        }
+        .direction-card-arrow {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            color: #E60012;
+            cursor: pointer;
+        }
+        .empty-results {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Поиск направлений</h1>
+        </div>
+
+        <form id="search-form" method="get" action="{% url 'direction_search' %}">
+            <div class="search-area">
+                <div class="search-filters">
+                    <div class="form-group">
+                        <label class="form-label">Донор</label>
+                        <div class="custom-select">
+                            <select id="donor-select" name="donor">
+                                <option value="">Выберите донора</option>
+                                {% for donor in donors %}
+                                    <option value="{{ donor.id }}" {% if selected_donor == donor.id %}selected{% endif %}>
+                                        {{ donor.get_full_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Дата</label>
+                        <div class="custom-select">
+                            <select id="date-select" name="date">
+                                <option value="">Любая дата</option>
+                                <option value="today" {% if selected_date == 'today' %}selected{% endif %}>Сегодня</option>
+                                <option value="week" {% if selected_date == 'week' %}selected{% endif %}>За неделю</option>
+                                <option value="month" {% if selected_date == 'month' %}selected{% endif %}>За месяц</option>
+                                <option value="year" {% if selected_date == 'year' %}selected{% endif %}>За год</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Актуальность направления</label>
+                        <div class="custom-select">
+                            <select id="status-select" name="status">
+                                <option value="">Любой статус</option>
+                                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Активные</option>
+                                <option value="expired" {% if selected_status == 'expired' %}selected{% endif %}>Истекшие</option>
+                                <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Выполненные</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="radio-container">
+                        <div class="form-label">Вид направления</div>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="direction_location" value="internal" {% if selected_location == 'internal' %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    Внутреннее
+                                </label>
+                            </div>
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="direction_location" value="external" {% if selected_location == 'external' %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    Внешнее (в поликлинику)
+                                </label>
+                            </div>
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="direction_location" value="any" {% if selected_location == 'any' or not selected_location %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    Любое
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="radio-container">
+                        <div class="form-label">Тип направления</div>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="direction_type" value="examination" {% if selected_type == 'examination' %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    На осмотр
+                                </label>
+                            </div>
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="direction_type" value="analysis" {% if selected_type == 'analysis' %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    На исследование
+                                </label>
+                            </div>
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="direction_type" value="donation" {% if selected_type == 'donation' %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    На донацию
+                                </label>
+                            </div>
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="direction_type" value="any" {% if selected_type == 'any' or not selected_type %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    Любое
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="button button-primary">Применить</button>
+                    <button type="button" id="reset-button" class="button button-secondary">Сбросить</button>
+                </div>
+
+                <div class="search-results">
+                    {% if directions %}
+                        {% for direction in directions %}
+                            <div class="direction-card">
+                                <div class="direction-card-header">
+                                    <h3 class="direction-card-title">Направление</h3>
+                                    <span class="direction-card-expiry">Срок истечения: {{ direction.expiry_date|date:"d.m.Y" }}</span>
+                                </div>
+                                <div class="direction-card-content">
+                                    <div class="direction-card-info">
+                                        <div class="direction-card-info-item">
+                                            <span class="direction-card-info-label">Тип:</span>
+                                            <span class="direction-card-info-value">{{ direction.get_type_display }}</span>
+                                        </div>
+                                        <div class="direction-card-info-item">
+                                            <span class="direction-card-info-label">Донор:</span>
+                                            <span class="direction-card-info-value">{{ direction.donor.get_full_name }}</span>
+                                        </div>
+                                        <div class="direction-card-info-item">
+                                            <span class="direction-card-info-label">Дата создания:</span>
+                                            <span class="direction-card-info-value">{{ direction.created_at|date:"d.m.Y" }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ direction.get_view_url }}" class="direction-card-arrow">
+                                        &#10095;
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-results">
+                            <p>По вашему запросу ничего не найдено.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Reset button functionality
+        const resetButton = document.getElementById('reset-button');
+        resetButton.addEventListener('click', function() {
+            // Reset all form fields
+            document.getElementById('donor-select').value = '';
+            document.getElementById('date-select').value = '';
+            document.getElementById('status-select').value = '';
+            
+            // Reset radio buttons to "Any"
+            document.querySelector('input[name="direction_location"][value="any"]').checked = true;
+            document.querySelector('input[name="direction_type"][value="any"]').checked = true;
+            
+            // Submit the form with reset values
+            document.getElementById('search-form').submit();
+        });
+    });
+</script>
+</body>
+</html>

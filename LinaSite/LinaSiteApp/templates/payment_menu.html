@@ -161,7 +161,7 @@
         <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
             <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
         </div>
-        <div class="side-menu-item-active" onclick="window.location.href='/app/main'">
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
             <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
         </div>
         <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
@@ -170,7 +170,7 @@
         <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
             <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
         </div>
-        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+        <div class="side-menu-item-active" onclick="window.location.href='https://www.google.com'">
             <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
         </div>
         <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
@@ -187,13 +187,13 @@
                 {% if is_first_button %}
                 <label>
                     <input type="radio" name="action" id="donor-register" checked>
-                    <span>Внести информацию о пришедшем доноре</span>
+                    <span>Внести информацию о выплате</span>
                     <div class="selected-border"></div>
                 </label>
                 {% endif %}
                 <label>
                     <input type="radio" name="action" id="donor-search">
-                    <span>Просмотреть информацию о донорах</span>
+                    <span>Просмотреть информацию о выплатах</span>
                     <div class="selected-border"></div>
                 </label>
             </div>
@@ -207,9 +207,9 @@
     <script>
         document.getElementById('apply-button').addEventListener('click', function() {
             if (document.getElementById('donor-register').checked) {
-                window.location.href = '/app/donation/register/';
+                window.location.href = '/app/payment/register/';
             } else if (document.getElementById('donor-search').checked) {
-                window.location.href = '/app/donor-search/';
+                window.location.href = '/app/payment/search/';
             }
         });
 

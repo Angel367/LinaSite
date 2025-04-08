@@ -15,7 +15,7 @@
             display: flex;
             margin: 0;
             height: 100vh;
-            background-color: white;
+            background-color: #F8F8F8;
         }
         .side-menu {
             width: 160px;
@@ -81,6 +81,8 @@
             background: white;
             text-align: center;
             padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 400px;
             width: 100%;
         }
@@ -161,10 +163,10 @@
         <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
             <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
         </div>
-        <div class="side-menu-item-active" onclick="window.location.href='/app/main'">
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
             <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
         </div>
-        <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
+        <div class="side-menu-item-active" onclick="window.location.href='/app/direction/menu'">
             <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
         </div>
         <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
@@ -186,14 +188,14 @@
             <div class="option">
                 {% if is_first_button %}
                 <label>
-                    <input type="radio" name="action" id="donor-register" checked>
-                    <span>Внести информацию о пришедшем доноре</span>
+                    <input type="radio" name="action" checked id="donor-register">
+                    <span>Обработать направление<p style="font-size: 14px">Если направление внешнее, перейдите в карточку донора</p></span>
                     <div class="selected-border"></div>
                 </label>
                 {% endif %}
                 <label>
-                    <input type="radio" name="action" id="donor-search">
-                    <span>Просмотреть информацию о донорах</span>
+                    <input type="radio" name="action" id="donations">
+                    <span>Просмотреть информацию о направлениях</span>
                     <div class="selected-border"></div>
                 </label>
             </div>
@@ -203,16 +205,14 @@
             </div>
         </div>
     </div>
-
     <script>
         document.getElementById('apply-button').addEventListener('click', function() {
             if (document.getElementById('donor-register').checked) {
-                window.location.href = '/app/donation/register/';
-            } else if (document.getElementById('donor-search').checked) {
-                window.location.href = '/app/donor-search/';
+                window.location.href = `{{ link }}`;
+            } else if (document.getElementById('donations').checked) {
+                window.location.href = '/app/directions/';
             }
         });
-
         document.getElementById('reset-button').addEventListener('click', function() {
             document.getElementById('donor-register').checked = true;
         });

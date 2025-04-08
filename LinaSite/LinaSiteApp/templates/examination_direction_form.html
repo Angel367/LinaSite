@@ -1,0 +1,783 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Направление на осмотр</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+        body {
+            display: flex;
+        }
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            padding: 30px 30px 20px 30px;
+        }
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+            font-weight: normal;
+        }
+        .content-area {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .left-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .center-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .right-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            margin-bottom: 5px;
+            max-width: 100%;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .custom-select {
+            position: relative;
+            height: 50px;
+            width: 100%;
+        }
+        .custom-select select {
+            display: block;
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            background-color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            appearance: none;
+            font-size: 14px;
+        }
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #aaa;
+            pointer-events: none;
+        }
+        .text-input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            background-color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .checkbox-container {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .checkbox-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Custom checkbox styling with red color */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        .custom-checkbox {
+            position: relative;
+            padding-left: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .checkmark {
+            position: absolute;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: white;
+        }
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+            left: 5px;
+            top: 1px;
+            width: 5px;
+            height: 10px;
+            border: solid #E60012;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .donation-type-container {
+            margin-top: 10px;
+        }
+        .donation-type-label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .donation-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .donation-type {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .donation-type.selected {
+            background-color: #E60012;
+            color: white;
+            border-color: #E60012;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .button {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            border: none;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 1px solid #E60012;
+        }
+        .required-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+        /* Read-only styles */
+        .read-only-input {
+            background-color: #f9f9f9 !important;
+            cursor: not-allowed;
+        }
+        .read-only-notice {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .read-only-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Направление на осмотр</h1>
+        </div>
+
+        {% if read_only %}
+        <div class="read-only-notice">
+            <p>Просмотр направления. Все поля доступны только для чтения.</p>
+        </div>
+        {% endif %}
+
+        <form id="examination-form" method="post" action="{% if not read_only %}{% url 'examination_direction_create' %}{% endif %}">
+            {% csrf_token %}
+            <div class="content-area">
+                <div class="left-section">
+                    <div class="form-group">
+                        <label class="form-label">Дата предполагаемой донации*</label>
+                        <div class="custom-select">
+                            <select id="planned-donation-date" name="planned_donation_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Выберите дату</option>
+                                {% for date in available_dates %}
+                                    <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.planned_donation_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Донор*</label>
+                        <div class="custom-select">
+                            <select id="donor-select" name="donor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Выберите донора</option>
+                                {% for donor in donors %}
+                                    <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Номер документа, удостоверяющего личность*</label>
+                        <input type="text" id="document-id" name="document_number" class="text-input {% if read_only %}read-only-input{% endif %}" required {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.document_number }}{% endif %}">
+                    </div>
+
+                    <div class="form-group donation-type-container">
+                        <label class="donation-type-label">Выберите тип донации</label>
+                        <div class="donation-types">
+                            <div class="donation-type {% if direction and direction.donation_type == 'whole_blood' %}selected{% endif %}" data-type="whole_blood" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                                Цельная кровь
+                            </div>
+                            <div class="donation-type {% if direction and direction.donation_type == 'plasma' %}selected{% endif %}" data-type="plasma" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                                Плазма
+                            </div>
+                            <div class="donation-type {% if direction and direction.donation_type == 'platelets' %}selected{% endif %}" data-type="platelets" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                                Тромбоциты
+                            </div>
+                            <div class="donation-type {% if direction and direction.donation_type == 'erythrocytes' %}selected{% endif %}" data-type="erythrocytes" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                                Эритроциты
+                            </div>
+                            <div class="donation-type {% if direction and direction.donation_type == 'granulocytes' %}selected{% endif %}" data-type="granulocytes" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                                Гранулоциты
+                            </div>
+                        </div>
+                        <input type="hidden" id="donation-type" name="donation_type" value="{% if direction %}{{ direction.donation_type }}{% endif %}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Группа крови*</label>
+                        <div class="custom-select">
+                            <select id="blood-group" name="blood_group" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Группа крови</option>
+                                <option value="O-" {% if direction and direction.blood_group == 'O-' %}selected{% endif %}>O-</option>
+                                <option value="O+" {% if direction and direction.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                                <option value="A-" {% if direction and direction.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                                <option value="A+" {% if direction and direction.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                                <option value="B-" {% if direction and direction.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                                <option value="B+" {% if direction and direction.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                                <option value="AB-" {% if direction and direction.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                                <option value="AB+" {% if direction and direction.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Rh-фактор*</label>
+                        <div class="custom-select">
+                            <select id="rh-factor" name="rh_factor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                                <option value="">Rh-фактор</option>
+                                <option value="+" {% if direction and direction.rh_factor == '+' %}selected{% endif %}>Положительный (+)</option>
+                                <option value="-" {% if direction and direction.rh_factor == '-' %}selected{% endif %}>Отрицательный (-)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-section">
+                    <div class="checkbox-container">
+                        <div class="checkbox-title">Есть ли жалобы?*</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="complaints-yes" name="has_complaints" value="yes" {% if direction and direction.has_complaints == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="complaints-no" name="has_complaints" value="no" {% if direction and direction.has_complaints == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-container">
+                        <div class="checkbox-title">Имеются ли в анамнезе заболевания из перечня противопоказаний?*</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="contraindications-yes" name="has_contraindications" value="yes" {% if direction and direction.has_contraindications == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="contraindications-no" name="has_contraindications" value="no" {% if direction and direction.has_contraindications == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-container">
+                        <div class="checkbox-title">Склеры, видимые слизистые (полости рта, носа) нормально окрашены?*</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="mucous-yes" name="normal_mucous" value="yes" {% if direction and direction.normal_mucous == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="mucous-no" name="normal_mucous" value="no" {% if direction and direction.normal_mucous == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-container">
+                        <div class="checkbox-title">Кожа чистая, лимфоузлы не увеличены?*</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="skin-yes" name="clean_skin" value="yes" {% if direction and direction.clean_skin == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="skin-no" name="clean_skin" value="no" {% if direction and direction.clean_skin == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-container">
+                        <div class="checkbox-title">Выявлены ли патологии при аускультации сердца и легких?*</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="cardiac-yes" name="normal_cardiac" value="yes" {% if direction and direction.normal_cardiac == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="cardiac-no" name="normal_cardiac" value="no" {% if direction and direction.normal_cardiac == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-container">
+                        <div class="checkbox-title">Есть ли отклонения в органах брюшной полости?*</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="abdomen-yes" name="normal_abdomen" value="yes" {% if direction and direction.normal_abdomen == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="abdomen-no" name="normal_abdomen" value="no" {% if direction and direction.normal_abdomen == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-container">
+                        <div class="checkbox-title">Были ли операции/вакцинации в течение последних 2 месяцев?*</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="operations-yes" name="recent_operations" value="yes" {% if direction and direction.recent_operations == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="operations-no" name="recent_operations" value="no" {% if direction and direction.recent_operations == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-section">
+                    <div class="form-group">
+                        <label class="form-label">Значение артериального давления*</label>
+                        <input type="text" id="blood-pressure" name="blood_pressure" class="text-input {% if read_only %}read-only-input{% endif %}" required {% if read_only %}readonly{% endif %} placeholder="120/80" value="{% if direction %}{{ direction.blood_pressure }}{% endif %}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Пульс*</label>
+                        <input type="number" id="pulse" name="pulse" class="text-input {% if read_only %}read-only-input{% endif %}" required min="40" max="200" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.pulse }}{% endif %}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Температура тела*</label>
+                        <input type="number" id="temperature" name="temperature" class="text-input {% if read_only %}read-only-input{% endif %}" required step="0.1" min="35.0" max="42.0" placeholder="36.6" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.temperature }}{% endif %}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Рост (см)*</label>
+                        <input type="number" id="height" name="height" class="text-input {% if read_only %}read-only-input{% endif %}" required min="140" max="240" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.height }}{% endif %}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Вес (кг)*</label>
+                        <input type="number" id="weight" name="weight" class="text-input {% if read_only %}read-only-input{% endif %}" required step="0.1" min="45" max="200" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.weight }}{% endif %}">
+                    </div>
+
+                    <p class="required-note">*поле обязательно для заполнения</p>
+
+                    <!-- Regular buttons (hidden in read-only mode) -->
+                    <div class="button-container {% if read_only %}read-only-hidden{% endif %}">
+                        <button type="submit" id="approve-button" name="is_approved" value="true" class="button button-primary">Допустить</button>
+                        <button type="submit" id="reject-button" name="is_approved" value="false" class="button button-secondary">Отклонить</button>
+                    </div>
+
+                    <!-- Back button (shown only in read-only mode) -->
+                    {% if read_only %}
+                    <div class="button-container">
+                        <a href="{% url 'direction_search' %}" class="button button-primary">Вернуться к поиску</a>
+
+                        <!-- Status display -->
+                        <div style="text-align: center; margin-top: 10px; font-weight: bold;">
+                            {% if direction.is_approved %}
+                            <span style="color: #28a745;">✓ Допущен к донации</span>
+                            {% else %}
+                            <span style="color: #dc3545;">✗ Не допущен к донации</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if we're in read-only mode
+        const isReadOnly = {% if read_only %}true{% else %}false{% endif %};
+
+        // If we're in read-only mode, disable the form functionality
+        if (isReadOnly) {
+            // No need to initialize interactive elements in read-only mode
+            return;
+        }
+
+        // Инициализация компонентов
+        const donorSelect = document.getElementById('donor-select');
+        const documentIdField = document.getElementById('document-id');
+        const bloodGroupField = document.getElementById('blood-group');
+        const rhFactorField = document.getElementById('rh-factor');
+        const bloodPressureField = document.getElementById('blood-pressure');
+        const pulseField = document.getElementById('pulse');
+        const temperatureField = document.getElementById('temperature');
+        const heightField = document.getElementById('height');
+        const weightField = document.getElementById('weight');
+        const donationTypeField = document.getElementById('donation-type');
+
+        // Настройка чекбоксов (взаимное исключение)
+        setupMutuallyExclusiveCheckboxes('complaints-yes', 'complaints-no');
+        setupMutuallyExclusiveCheckboxes('contraindications-yes', 'contraindications-no');
+        setupMutuallyExclusiveCheckboxes('mucous-yes', 'mucous-no');
+        setupMutuallyExclusiveCheckboxes('skin-yes', 'skin-no');
+        setupMutuallyExclusiveCheckboxes('cardiac-yes', 'cardiac-no');
+        setupMutuallyExclusiveCheckboxes('abdomen-yes', 'abdomen-no');
+        setupMutuallyExclusiveCheckboxes('operations-yes', 'operations-no');
+
+        function setupMutuallyExclusiveCheckboxes(id1, id2) {
+            const checkbox1 = document.getElementById(id1);
+            const checkbox2 = document.getElementById(id2);
+
+            checkbox1.addEventListener('change', function() {
+                if (this.checked) {
+                    checkbox2.checked = false;
+                }
+            });
+
+            checkbox2.addEventListener('change', function() {
+                if (this.checked) {
+                    checkbox1.checked = false;
+                }
+            });
+        }
+
+        // Обработка выбора типа донации
+        const donationTypes = document.querySelectorAll('.donation-type');
+        donationTypes.forEach(type => {
+            type.addEventListener('click', function() {
+                // Снимаем выделение со всех типов
+                donationTypes.forEach(t => t.classList.remove('selected'));
+                // Выделяем текущий тип
+                this.classList.add('selected');
+                // Сохраняем значение
+                donationTypeField.value = this.getAttribute('data-type');
+            });
+        });
+
+        // Автозаполнение при выборе донора
+        donorSelect.addEventListener('change', function() {
+            const donorId = this.value;
+            if (!donorId) {
+                clearDonorFields();
+                return;
+            }
+
+            // Запрашиваем информацию о доноре через API
+            fetch(`/app/api/donor/${donorId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Заполняем поля данными донора
+                        documentIdField.value = data.document_number || '';
+                        bloodGroupField.value = data.blood_group || '';
+                        rhFactorField.value = data.rh_factor || '';
+
+                        // Заполняем последние известные показатели, если они есть
+                        if (data.last_weight) {
+                            weightField.value = data.last_weight;
+                        }
+                        if (data.last_pressure) {
+                            bloodPressureField.value = data.last_pressure;
+                        }
+                        if (data.last_height) {
+                            heightField.value = data.last_height;
+                        }
+
+                        // Получаем информацию о предпочитаемом типе донации
+                        if (data.preferred_donation_type) {
+                            // Выбираем соответствующий тип донации
+                            donationTypes.forEach(type => {
+                                if (type.getAttribute('data-type') === data.preferred_donation_type) {
+                                    type.click(); // Симулируем клик для выбора
+                                }
+                            });
+                        }
+                    } else {
+                        alert('Ошибка при получении данных донора');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+        });
+
+        // Функция очистки полей
+        function clearDonorFields() {
+            documentIdField.value = '';
+            bloodGroupField.value = '';
+            rhFactorField.value = '';
+            // Не очищаем показатели здоровья, так как они вводятся вручную
+            donationTypes.forEach(t => t.classList.remove('selected'));
+            donationTypeField.value = '';
+        }
+
+        // Обработка отправки формы
+        const examinationForm = document.getElementById('examination-form');
+        examinationForm.addEventListener('submit', function(event) {
+            // Проверяем выбраны ли все обязательные чекбоксы
+            const checkboxGroups = [
+                ['complaints-yes', 'complaints-no'],
+                ['contraindications-yes', 'contraindications-no'],
+                ['mucous-yes', 'mucous-no'],
+                ['skin-yes', 'skin-no'],
+                ['cardiac-yes', 'cardiac-no'],
+                ['abdomen-yes', 'abdomen-no'],
+                ['operations-yes', 'operations-no']
+            ];
+
+            for (const group of checkboxGroups) {
+                const isAnyChecked = group.some(id => document.getElementById(id).checked);
+                if (!isAnyChecked) {
+                    alert('Пожалуйста, ответьте на все вопросы медицинского осмотра');
+                    event.preventDefault();
+                    return;
+                }
+            }
+
+            // Проверяем, выбран ли тип донации
+            if (!donationTypeField.value) {
+                alert('Пожалуйста, выберите тип донации');
+                event.preventDefault();
+                return;
+            }
+        });
+    });
+</script>
+</body>
+</html>

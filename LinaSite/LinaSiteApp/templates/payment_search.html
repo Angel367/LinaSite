@@ -1,0 +1,596 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск выплат</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+
+        body {
+            display: flex;
+        }
+
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .search-filters {
+            width: 280px;
+        }
+
+        .search-results {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            max-height: calc(100vh - 100px);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select select {
+            display: block;
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            background-color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            appearance: none;
+            font-size: 14px;
+        }
+
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #aaa;
+            pointer-events: none;
+        }
+
+        .radio-container {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .radio-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-radio {
+            position: relative;
+            padding-left: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-radio input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .radio-mark {
+            position: absolute;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+        }
+
+        .custom-radio input:checked ~ .radio-mark {
+            background-color: white;
+        }
+
+        .radio-mark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .custom-radio input:checked ~ .radio-mark:after {
+            display: block;
+            left: 5px;
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            background-color: #E60012;
+            border-radius: 50%;
+        }
+
+        .button {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+            border: none;
+        }
+
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 1px solid #E60012;
+        }
+
+        .payment-card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .payment-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .payment-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .payment-info-column {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .payment-detail {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .payment-detail.small {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .payment-detail.medium {
+            font-size: 13px;
+        }
+
+        .payment-detail.large {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .payment-date {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .payment-date-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .payment-date-value {
+            width: 120px;
+            height: 25px;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            font-size: 13px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-arrow {
+            color: #E60012;
+            font-size: 24px;
+            margin-left: 10px;
+        }
+
+        .payment-placeholder {
+            height: 16px;
+            background-color: #f2f2f2;
+            border-radius: 3px;
+        }
+
+        .payment-placeholder.small {
+            width: 80px;
+        }
+
+        .payment-placeholder.medium {
+            width: 120px;
+        }
+
+        .payment-placeholder.large {
+            width: 160px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .document-type-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+            font-size: 11px !important;
+            color: #555 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+<div class="main-content">
+    <h1 class="page-title">Поиск выплат</h1>
+
+    <div class="search-container">
+        <div class="search-filters">
+            <form id="payment-search-form" method="get" action="{% url 'payment_search' %}">
+                <div class="form-group">
+                    <label class="form-label">Донор</label>
+                    <div class="custom-select">
+                        <select id="donor-select" name="donor">
+                            <option value="">Выберите донора</option>
+                            {% for donor in donors %}
+                                <option value="{{ donor.id }}"
+                                        {% if selected_donor == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Дата</label>
+                    <div class="custom-select">
+                        <select id="date-select" name="date">
+                            <option value="">Выберите дату</option>
+                            {% for date in dates %}
+                                <option value="{{ date|date:'Y-m-d' }}"
+                                        {% if selected_date == date|date:'Y-m-d' %}selected{% endif %}>{{ date|date:"d.m.Y" }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Тип документа</label>
+                    <div class="custom-select">
+                        <select id="document-type-select" name="document_type">
+                            <option value="">Выберите тип документа</option>
+                            <option value="payment_info"
+                                    {% if selected_document_type == 'payment_info' %}selected{% endif %}>Сведения о
+                                выплате
+                            </option>
+                            <option value="payment_application"
+                                    {% if selected_document_type == 'payment_application' %}selected{% endif %}>
+                                Заявление на выплату
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="radio-container">
+                    <div class="radio-options">
+                        <div class="radio-item">
+                            <label class="custom-radio">
+                                <input type="radio" name="payment_type" value="social_support"
+                                       {% if selected_payment_type == 'social_support' %}checked{% endif %}>
+                                <span class="radio-mark"></span>
+                                Социальная поддержка
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <label class="custom-radio">
+                                <input type="radio" name="payment_type" value="payment"
+                                       {% if selected_payment_type == 'payment' %}checked{% endif %}>
+                                <span class="radio-mark"></span>
+                                Оплата
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <label class="custom-radio">
+                                <input type="radio" name="payment_type" value="compensation"
+                                       {% if selected_payment_type == 'compensation' %}checked{% endif %}>
+                                <span class="radio-mark"></span>
+                                Компенсация
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <label class="custom-radio">
+                                <input type="radio" name="payment_type" value="any"
+                                       {% if not selected_payment_type or selected_payment_type == 'any' %}checked{% endif %}>
+                                <span class="radio-mark"></span>
+                                Любой
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="button button-primary">Применить</button>
+                <button type="reset" id="reset-button" class="button button-secondary">Сбросить</button>
+            </form>
+        </div>
+
+<!-- Заменяем блок с результатами поиска -->
+<div class="search-results">
+    {% if results %}
+        {% for result in results %}
+            <div class="payment-card" data-payment-id="{{ result.payment_id }}">
+                <div class="payment-info">
+                    <div class="payment-info-column">
+                        <div class="payment-detail large">{{ result.donor_lastname }} {{ result.donor_firstname }}</div>
+                        <div class="payment-detail small">{{ result.payment_type_display }}</div>
+                    </div>
+                    <div class="payment-info-column">
+                        <div class="payment-detail medium">Сумма: {{ result.amount }} руб.</div>
+                        <div class="payment-detail">Донация: {{ result.donation_date|date:"d.m.Y" }}</div>
+                    </div>
+                    <div class="payment-info-column">
+                        <div class="payment-detail">{{ result.document_id }}</div>
+
+                        {% if result.is_application %}
+                            <div class="payment-detail small document-type-tag application-tag">Заявление на выплату</div>
+                        {% else %}
+                            <div class="payment-detail small document-type-tag info-tag">Сведения о выплате</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="payment-date">
+                    <span class="payment-date-label">
+                        {% if result.payment_type == 'social_support' %}
+                            Срок выплаты:
+                        {% else %}
+                            Срок истечения:
+                        {% endif %}
+                    </span>
+                    <div class="payment-date-value">{{ result.expiration_date|date:"d.m.Y" }}</div>
+                </div>
+                <div class="payment-arrow">›</div>
+            </div>
+        {% endfor %}
+    {% else %}
+        {% if search_performed %}
+            <div class="no-results">
+                <p>По вашему запросу ничего не найдено. Попробуйте изменить параметры поиска.</p>
+            </div>
+        {% else %}
+            <!-- Демонстрационные платежи для макета -->
+            <div class="payment-card">
+                <div class="payment-info">
+                    <div class="payment-info-column">
+                        <div class="payment-placeholder large"></div>
+                        <div class="payment-placeholder small"></div>
+                    </div>
+                    <div class="payment-info-column">
+                        <div class="payment-placeholder medium"></div>
+                        <div class="payment-placeholder"></div>
+                    </div>
+                    <div class="payment-info-column">
+                        <div class="payment-placeholder"></div>
+                    </div>
+                </div>
+                <div class="payment-date">
+                    <span class="payment-date-label">Срок выплаты:</span>
+                    <div class="payment-date-value">05.04.2025</div>
+                </div>
+                <div class="payment-arrow">›</div>
+            </div>
+
+            <div class="payment-card">
+                <div class="payment-info">
+                    <div class="payment-info-column">
+                        <div class="payment-placeholder large"></div>
+                        <div class="payment-placeholder small"></div>
+                    </div>
+                    <div class="payment-info-column">
+                        <div class="payment-placeholder medium"></div>
+                        <div class="payment-placeholder"></div>
+                    </div>
+                    <div class="payment-info-column">
+                        <div class="payment-placeholder"></div>
+                    </div>
+                </div>
+                <div class="payment-date">
+                    <span class="payment-date-label">Срок выплаты:</span>
+                    <div class="payment-date-value">05.04.2025</div>
+                </div>
+                <div class="payment-arrow">›</div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Reset кнопка
+        const resetButton = document.getElementById('reset-button');
+        const searchForm = document.getElementById('payment-search-form');
+
+        resetButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            // Сбросить все поля формы
+            document.getElementById('donor-select').value = '';
+            document.getElementById('date-select').value = '';
+            document.getElementById('document-type-select').value = '';
+
+            // Установить радио-кнопку "Любой" как выбранную
+            document.querySelector('input[name="payment_type"][value="any"]').checked = true;
+
+            // Отправить форму
+            searchForm.submit();
+        });
+
+        // Клик по карточке выплаты
+        const paymentCards = document.querySelectorAll('.payment-card');
+
+        paymentCards.forEach(card => {
+            card.addEventListener('click', function () {
+                const paymentId = this.getAttribute('data-payment-id');
+                if (paymentId) {
+                    window.location.href = '/app/payment/' + paymentId + '/details/';
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

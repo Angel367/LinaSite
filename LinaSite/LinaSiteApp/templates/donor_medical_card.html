@@ -1,0 +1,539 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Медицинская карта донора</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+            color: #333;
+        }
+        body {
+            display: flex;
+        }
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red;
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+            font-weight: normal;
+        }
+
+        /* Новая структура контента */
+        .dashboard {
+            display: flex;
+            width: 100%;
+        }
+
+        .section {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            width: 100%;
+            display: flex;
+        }
+        .section2 {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .left-content {
+            width: 40%;
+            padding-right: 30px;
+        }
+
+        .right-content {
+            width: 60%;
+        }
+
+        .donation-summary {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-direction: column;
+        }
+
+        .donation-count-avatar {
+            width: 120px;
+            height: 120px;
+            background-color: #eee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            position: relative;
+        }
+
+        .donation-count-text {
+            position: absolute;
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .donation-label {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 5px;
+            align-content: center;
+             justify-content: center;
+            text-align: center;
+        }
+
+        .donation-circles {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            align-content: center;
+            justify-content: center;
+        }
+        .donation-circle-big {
+            display: flex;
+            flex-direction: column;
+        }
+        .donation-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .circle-red {
+            background-color: #E60012;
+        }
+
+        .circle-orange {
+            background-color: #FFA500;
+        }
+
+        .circle-yellow {
+            background-color: #FFD700;
+        }
+
+        .circle-blue {
+            background-color: #1E90FF;
+        }
+
+        .button {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+
+        .button-secondary {
+            color: #E60012;
+            background-color: transparent;
+            text-align: center;
+            border: none;
+            padding: 0;
+            margin: 5px 0;
+            text-decoration: none;
+            display: block;
+        }
+
+        .nav-item-column {
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+            flex-direction: column;
+        }
+
+
+        .nav-item {
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .nav-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-item-icon {
+            color: #E60012;
+            font-size: 20px;
+        }
+
+        /* Прогресс-круги */
+        .progress-section {
+            margin-bottom: 20px;
+
+        }
+
+        .circle-progress {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+            width: 150px;
+            height: 150px;
+        }
+
+        .progress-circle-bg {
+            fill: none;
+            stroke: #e6e6e6;
+            stroke-width: 15;
+        }
+
+        .progress-circle-progress {
+            fill: none;
+            stroke: #E60012;
+            stroke-width: 15;
+            stroke-dasharray: 440;
+            stroke-linecap: round;
+        }
+
+        .progress-text {
+            position: absolute;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        .progress-note {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+
+        /* Блок ограничений */
+        .restrictions-block h3 {
+            margin-top: 0;
+        }
+
+        .health-item {
+            margin-bottom: 15px;
+        }
+
+        .health-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .health-value {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .direction-link {
+            color: #E60012;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Выданные направления */
+        .directions-section h3 {
+            margin-top: 0;
+        }
+
+        .direction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .direction-item-icon {
+            color: #E60012;
+        }
+                .donor-status {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .donor-status-badge {
+            display: inline-block;
+            background-color: #FFF9C4;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .donor-status-badge-not-regular {
+            background-color: rgba(230, 0, 18, 0.1);
+            color: #E60012;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Медицинская карта донора</h1>
+        </div>
+
+        <div class="dashboard">
+            <!-- Первая секция с информацией о донациях -->
+            <div class="section">
+                <div class="left-content">
+                    <div class="donation-summary">
+                        <div class="donation-count-avatar">
+                        </div><br>
+                        <div class="donation-info">
+                                <span class="{{ is_regular_class }}">
+                                    {{ is_regular_text }}
+                                </span>
+                            <div class="donation-label">{{ total_donations }} донации</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="donation-label">Проведенные донации</div>
+                        <div class="donation-circles">
+                            <div class="donation-circle-big"><div class="donation-circle circle-red"></div><a style="text-align: center">9</a></div>
+                            <div class="donation-circle-big"><div class="donation-circle circle-orange"></div><a style="text-align: center">7</a></div>
+                            <div class="donation-circle-big"><div class="donation-circle circle-yellow"></div><a style="text-align: center">0</a></div>
+                            <div class="donation-circle-big"><div class="donation-circle circle-blue"></div><a style="text-align: center">0</a></div>
+                        </div>
+                    </div>
+
+                    <a href="/app/donation/create/" class="button button-primary">Добавить донацию</a>
+                    <a href="/app/donations/?donor={{ donor.id }}" class="button-secondary">Просмотреть все донации</a>
+
+                    <div style="margin-top: 20px;">
+                        <a href="/app/donor/view/{{ donor.id }}" class="nav-item">
+                            <div class="nav-item-column">
+                            <span>Персональные данные</span>
+                            <span style="font-size: 12px">{{ personal_data }}</span></div>
+                            <span class="nav-item-icon">›</span>
+                        </a>
+
+                        <a href="/app/donor-card/view/{{ donor.id }}" class="nav-item">
+                            <div class="nav-item-column">
+                            <span>Карточка донора</span>
+                            <span style="font-size: 12px">{{ donor_data }}</span></div>
+                            <span class="nav-item-icon">›</span>
+                        </a>
+                    </div>
+
+                    <a href="/app/donation/create/" class="button button-primary" style="margin-top: 20px;">Записать на донацию</a>
+                </div>
+
+                <div class="right-content">
+                    <!-- Первый прогресс-круг -->
+                    <div class="progress-section">
+                        <div class="circle-progress">
+                            <svg class="progress-circle">
+                                <circle class="progress-circle-bg" cx="75" cy="75" r="70"></circle>
+                                <circle class="progress-circle-progress" cx="75" cy="75" r="70" stroke-dashoffset="{{ first_progress_offset }}"></circle>
+                            </svg>
+                            <div class="progress-text">
+                                Осталось<br>из 60
+                            </div>
+                        </div>
+                        <div class="progress-note">
+                            Если донаций цельной крови/<br>клеточных компонентов меньше 25
+                        </div>
+                    </div>
+
+                    <!-- Второй прогресс-круг -->
+                    <div class="progress-section">
+                        <div class="circle-progress">
+                            <svg class="progress-circle">
+                                <circle class="progress-circle-bg" cx="75" cy="75" r="70"></circle>
+                                <circle class="progress-circle-progress" cx="75" cy="75" r="70" stroke-dashoffset="{{ second_progress_offset }}"></circle>
+                            </svg>
+                            <div class="progress-text">
+                                Осталось<br>из 40
+                            </div>
+                        </div>
+                        <div class="progress-note">
+                            Из них<br>минимум 25 донаций цельной<br>крови/клеточных компонентов
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вторая секция с ограничениями и направлениями -->
+            <div class="section2">
+                <div class="left-content">
+                    <div class="restrictions-block">
+                        <h3>Ограничения по здоровью</h3>
+                        <div class="health-item">
+                            <div class="health-label">Последний вес: кг (граница сдачи плазмацитарной массы)</div>
+                            <div class="health-value">{{ donor.last_weight|default:"65.61" }}</div>
+                        </div>
+                        <div class="health-item">
+                            <div class="health-label">Последнее значение артериального давления:</div>
+                            <div class="health-value">{{ donor.last_pressure|default:"115/61" }}</div>
+                        </div>
+
+                        {% for direction in latest_directions %}
+                        <a href="{{ direction.get_view_url }}" class="direction-link">Выдано направление</a>
+                        {% endfor %}
+                        <!-- Если нет направлений, показываем демо-содержимое -->
+                        {% if not latest_directions %}
+                        <a href="#" class="direction-link">Выдано направление</a>
+                        <a href="#" class="direction-link">Выдано направление</a>
+                        <a href="#" class="direction-link">Выдано направление</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="right-content">
+                    <div class="directions-section">
+                        <h3>Выданные направления</h3>
+                        <div>
+                            {% for direction in active_directions %}
+                            <a href="{{ direction.get_view_url }}" class="direction-item">
+                                <span>Направление</span>
+                                <span class="direction-item-icon">›</span>
+                            </a>
+                            {% endfor %}
+                            <!-- Если нет направлений, показываем демо-содержимое -->
+                            {% if not active_directions %}
+                            <a href="#" class="direction-item">
+                                <span>Направление</span>
+                                <span class="direction-item-icon">›</span>
+                            </a>
+                            <a href="#" class="direction-item">
+                                <span>Направление</span>
+                                <span class="direction-item-icon">›</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

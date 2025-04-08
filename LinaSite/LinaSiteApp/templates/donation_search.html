@@ -1,0 +1,485 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск донаций</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+        body {
+            display: flex;
+        }
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+            font-weight: normal;
+        }
+        .search-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        .search-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .search-results {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-label {
+            font-size: 14px;
+            color: #333;
+        }
+        .custom-select {
+            position: relative;
+        }
+        .custom-select select {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            appearance: none;
+            border: none;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #aaa;
+            pointer-events: none;
+        }
+        .radio-container {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+        }
+        .custom-radio {
+            position: relative;
+            padding-left: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+        .custom-radio input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .radio-mark {
+            position: absolute;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+        }
+        .custom-radio input:checked ~ .radio-mark {
+            background-color: white;
+        }
+        .radio-mark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .custom-radio input:checked ~ .radio-mark:after {
+            display: block;
+            left: 5px;
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            background-color: #E60012;
+            border-radius: 50%;
+        }
+        .button {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            border: none;
+            margin-bottom: 10px;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 1px solid #E60012;
+        }
+        .donation-card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+        }
+        .donation-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        .donation-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .donation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .donation-details {
+            display: flex;
+            gap: 15px;
+        }
+        .donation-detail {
+            font-size: 14px;
+            color: #555;
+        }
+        .donation-date {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .donation-date-label {
+            font-size: 14px;
+            color: #555;
+        }
+        .donation-date-value {
+            font-size: 14px;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .donation-arrow {
+            color: #E60012;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .add-donation-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 16px;
+            color: #E60012;
+            border: 1px solid #E60012;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .add-donation-button:hover {
+            background-color: #ffe6e7;
+        }
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/direction-main/'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/logout'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Поиск донаций</h1>
+        </div>
+{##}
+{#        <a href="{% url 'donation_form' %}" class="add-donation-button">#}
+{#            <span>+</span> Добавить новую донацию#}
+{#        </a>#}
+
+        <form id="search-form" method="get" action="{% url 'donation_search' %}">
+            <div class="search-layout">
+                <div class="search-filters">
+                    <div class="form-group">
+                        <label class="form-label">Донор</label>
+                        <div class="custom-select">
+                            <select id="donor-select" name="donor">
+                                <option value="">Выберите донора</option>
+                                {% for donor in donors %}
+                                    <option value="{{ donor.id }}" {% if selected_donor == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Дата</label>
+                        <div class="custom-select">
+                            <select id="date-select" name="date">
+                                <option value="">Любая дата</option>
+                                <option value="today" {% if selected_date == 'today' %}selected{% endif %}>Сегодня</option>
+                                <option value="week" {% if selected_date == 'week' %}selected{% endif %}>За неделю</option>
+                                <option value="month" {% if selected_date == 'month' %}selected{% endif %}>За месяц</option>
+                                <option value="year" {% if selected_date == 'year' %}selected{% endif %}>За год</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Вид донации</label>
+                        <div class="custom-select">
+                            <select id="donation-type" name="donation_type">
+                                <option value="">Все типы</option>
+                                <option value="whole_blood" {% if selected_type == 'whole_blood' %}selected{% endif %}>Цельная кровь</option>
+                                <option value="plasma" {% if selected_type == 'plasma' %}selected{% endif %}>Плазма</option>
+                                <option value="platelets" {% if selected_type == 'platelets' %}selected{% endif %}>Тромбоциты</option>
+                                <option value="erythrocytes" {% if selected_type == 'erythrocytes' %}selected{% endif %}>Эритроциты</option>
+                                <option value="granulocytes" {% if selected_type == 'granulocytes' %}selected{% endif %}>Гранулоциты</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Группа крови</label>
+                        <div class="custom-select">
+                            <select id="blood-group" name="blood_group">
+                                <option value="">Все группы</option>
+                                <option value="O-" {% if selected_blood_group == 'O-' %}selected{% endif %}>O-</option>
+                                <option value="O+" {% if selected_blood_group == 'O+' %}selected{% endif %}>O+</option>
+                                <option value="A-" {% if selected_blood_group == 'A-' %}selected{% endif %}>A-</option>
+                                <option value="A+" {% if selected_blood_group == 'A+' %}selected{% endif %}>A+</option>
+                                <option value="B-" {% if selected_blood_group == 'B-' %}selected{% endif %}>B-</option>
+                                <option value="B+" {% if selected_blood_group == 'B+' %}selected{% endif %}>B+</option>
+                                <option value="AB-" {% if selected_blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                                <option value="AB+" {% if selected_blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Rh-фактор</label>
+                        <div class="custom-select">
+                            <select id="rh-factor" name="rh_factor">
+                                <option value="">Любой</option>
+                                <option value="+" {% if selected_rh_factor == '+' %}selected{% endif %}>Положительный (+)</option>
+                                <option value="-" {% if selected_rh_factor == '-' %}selected{% endif %}>Отрицательный (-)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="radio-container">
+                        <label class="form-label">Вернулся ли донор?</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="donor_returned" value="yes" {% if selected_returned == 'yes' %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    Да
+                                </label>
+                            </div>
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="donor_returned" value="no" {% if selected_returned == 'no' %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    Нет
+                                </label>
+                            </div>
+                            <div class="radio-item">
+                                <label class="custom-radio">
+                                    <input type="radio" name="donor_returned" value="any" {% if selected_returned == 'any' or not selected_returned %}checked{% endif %}>
+                                    <span class="radio-mark"></span>
+                                    Не важно
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="search-results">
+                                    <button type="submit" class="button button-primary">Применить</button>
+                    <button type="button" id="reset-button" class="button button-secondary">Сбросить</button>
+                    {% if donations %}
+                        {% for donation in donations %}
+                            <a href="{% url 'donation_view' donation.id %}" class="donation-card">
+                                <div class="donation-info">
+                                    <div class="donation-title">Донация</div>
+                                    <div class="donation-details">
+                                        <div class="donation-detail">{{ donation.donor.get_full_name }}</div>
+                                        <div class="donation-detail">{{ donation.get_donation_type_display }}</div>
+                                        <div class="donation-detail">{{ donation.donor.blood_group }}{{ donation.donor.rh_factor }}</div>
+                                    </div>
+                                </div>
+                                <div class="donation-date">
+                                    <span class="donation-date-label">Дата проведения:</span>
+                                    <span class="donation-date-value">{{ donation.donation_date|date:"d.m.Y" }}</span>
+                                </div>
+                                <div class="donation-arrow">&#10095;</div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-results">
+                            <p>По вашему запросу ничего не найдено.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Reset button functionality
+        const resetButton = document.getElementById('reset-button');
+        resetButton.addEventListener('click', function() {
+            // Reset all form fields
+            document.getElementById('donor-select').value = '';
+            document.getElementById('date-select').value = '';
+            document.getElementById('donation-type').value = '';
+            document.getElementById('blood-group').value = '';
+            document.getElementById('rh-factor').value = '';
+
+            // Reset radio buttons to "Any"
+            document.querySelector('input[name="donor_returned"][value="any"]').checked = true;
+
+            // Submit the form with reset values
+            document.getElementById('search-form').submit();
+        });
+    });
+</script>
+</body>
+</html>

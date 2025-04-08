@@ -1,0 +1,844 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о выплате</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+
+        body {
+            display: flex;
+        }
+
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 30px 30px 100px 30px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .content-area {
+            display: flex;
+            flex: 1;
+            width: 100%;
+        }
+
+        .left-section {
+            flex: 1;
+            padding: 15px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .center-section {
+            flex: 1;
+            padding: 15px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .right-section {
+            width: 250px;
+            padding: 15px 30px 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 5px;
+            max-width: 100%;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .custom-select {
+            position: relative;
+            height: 50px;
+            width: 100%;
+        }
+
+        .custom-select select {
+            display: block;
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            background-color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            appearance: none;
+            font-size: 14px;
+        }
+
+        .custom-select::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #aaa;
+            pointer-events: none;
+        }
+
+        .text-input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            background-color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .checkbox-container {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .checkbox-options {
+            display: flex;
+            gap: 20px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-checkbox {
+            position: relative;
+            padding-left: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: white;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+            left: 5px;
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            background-color: #E60012;
+        }
+
+        .radio-container {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            margin-bottom: 5px;
+        }
+
+        .radio-label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .radio-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-radio {
+            position: relative;
+            padding-left: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-radio input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .radio-mark {
+            position: absolute;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+        }
+
+        .custom-radio input:checked ~ .radio-mark {
+            background-color: white;
+        }
+
+        .radio-mark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .custom-radio input:checked ~ .radio-mark:after {
+            display: block;
+            left: 5px;
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            background-color: #E60012;
+            border-radius: 50%;
+        }
+
+        .donation-type-container {
+            margin-top: 10px;
+        }
+
+        .donation-type-label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .donation-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 элемента в строке */
+            gap: 10px; /* Промежутки между элементами */
+        }
+
+        .donation-type {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .donation-type.selected {
+            background-color: #E60012;
+            color: white;
+            border-color: #E60012;
+        }
+
+        .donation-type-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            display: inline-block;
+        }
+
+        .donation-type-dot.whole-blood {
+            background-color: #E60012;
+        }
+
+        .donation-type-dot.plasma {
+            background-color: #FFD700;
+        }
+
+        .donation-type-dot.platelets {
+            background-color: #FFA500;
+        }
+
+        .donation-type-dot.erythrocytes {
+            background-color: #800080;
+        }
+
+        .donation-type-dot.granulocytes {
+            background-color: #0000FF;
+        }
+
+        .button {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+            border: none;
+        }
+
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 1px solid #E60012;
+        }
+
+        .required-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+<div class="main-content">
+    <div class="header">
+        <h1 class="page-title">Информация о выплате</h1>
+    </div>
+
+<form id="payment-form" method="post" action="{% url 'payment_register' %}{% if edit_mode %}?edit={{ payment.id }}{% endif %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if edit_mode %}
+    <input type="hidden" name="edit_payment_id" value="{{ payment.id }}">
+    {% endif %}
+        <div class="content-area">
+            <div class="left-section">
+                <div class="form-group">
+                    <label class="form-label">Дата донации*</label>
+                    <div class="custom-select">
+                        <select id="donation-select" name="donation" required>
+                            <option value="">Выберите дату донации</option>
+                            {% for donation in donations %}
+                                <option value="{{ donation.id }}">{{ donation.donation_date }}
+                                    ({{ donation.donor.get_full_name }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Донор*</label>
+                    <div class="custom-select">
+                        <select id="donor-select" name="donor" required>
+                            <option value="">Выберите донора</option>
+                            {% for donor in donors %}
+                                <option value="{{ donor.id }}">{{ donor.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Номер документа, удостоверяющего личность*</label>
+                    <input type="text" id="document-id" name="document_id" class="text-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="donation-type-label">Выберите тип донации</label>
+                    <div class="donation-types">
+                        <div class="donation-type" data-component="whole_blood">
+                            <span class="donation-type-dot whole-blood"></span>
+                            Цельная кровь
+                        </div>
+                        <div class="donation-type" data-component="plasma">
+                            <span class="donation-type-dot plasma"></span>
+                            Плазма
+                        </div>
+                        <div class="donation-type" data-component="platelets">
+                            <span class="donation-type-dot platelets"></span>
+                            Тромбоциты
+                        </div>
+                        <div class="donation-type" data-component="erythrocytes">
+                            <span class="donation-type-dot erythrocytes"></span>
+                            Эритроциты
+                        </div>
+                        <div class="donation-type" data-component="granulocytes">
+                            <span class="donation-type-dot granulocytes"></span>
+                            Гранулоциты
+                        </div>
+                    </div>
+                    <input type="hidden" id="payment-components" name="payment_components" value="">
+                </div>
+            </div>
+
+            <div class="center-section">
+                <div class="checkbox-container">
+                    <label class="checkbox-label">Выплата осуществляется по накопительной системе?*</label>
+                    <div class="checkbox-options">
+                        <div class="checkbox-item">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="accumulative-yes" name="accumulative_system">
+                                <span class="checkmark"></span>
+                                Да
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="accumulative-no" name="non_accumulative_system">
+                                <span class="checkmark"></span>
+                                Нет
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkbox-container">
+                    <label class="checkbox-label">Донация осуществлялась на платной основе?*</label>
+                    <div class="checkbox-options">
+                        <div class="checkbox-item">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="paid-yes" name="is_paid_donation">
+                                <span class="checkmark"></span>
+                                Да
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="paid-no" name="is_not_paid_donation">
+                                <span class="checkmark"></span>
+                                Нет
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkbox-container">
+                    <label class="checkbox-label">Положена ли донору компенсация за питание?*</label>
+                    <div class="checkbox-options">
+                        <div class="checkbox-item">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="food-yes" name="food_compensation">
+                                <span class="checkmark"></span>
+                                Да
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="food-no" name="no_food_compensation">
+                                <span class="checkmark"></span>
+                                Нет
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="radio-container">
+                    <label class="radio-label">Вид выплаты</label>
+                    <div class="radio-options">
+                        <div class="radio-item">
+                            <label class="custom-radio">
+                                <input type="radio" id="payment-social" name="payment_type" value="social_support">
+                                <span class="radio-mark"></span>
+                                Социальная поддержка
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <label class="custom-radio">
+                                <input type="radio" id="payment-standard" name="payment_type" value="payment">
+                                <span class="radio-mark"></span>
+                                Оплата
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <label class="custom-radio">
+                                <input type="radio" id="payment-compensation" name="payment_type" value="compensation">
+                                <span class="radio-mark"></span>
+                                Компенсация
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Сумма выплаты (в рублях)*</label>
+                    <input type="number" step="0.01" name="amount" class="text-input" required>
+                </div>
+
+                <p class="required-note">*поле обязательно для заполнения</p>
+            </div>
+
+            <!-- Добавляем в форму перед закрывающим тегом </form> -->
+<div class="right-section">
+    <button type="submit" class="button button-primary">Применить</button>
+    <button type="reset" class="button button-secondary">Сбросить</button>
+
+    {% if not edit_mode %}
+    <div style="margin-top: 20px;">
+        <label for="application_file" class="form-label">Прикрепить скан заявления</label>
+        <input type="file" id="application_file" name="application_file" class="text-input">
+    </div>
+    {% endif %}
+</div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Инициализация компонентов
+        const donorSelect = document.getElementById('donor-select');
+        const donationSelect = document.getElementById('donation-select');
+        const documentIdField = document.getElementById('document-id');
+        const paymentComponentsField = document.getElementById('payment-components');
+
+        // Радио-группы с взаимным исключением
+        setupMutuallyExclusiveCheckboxes('accumulative-yes', 'accumulative-no');
+        setupMutuallyExclusiveCheckboxes('paid-yes', 'paid-no');
+        setupMutuallyExclusiveCheckboxes('food-yes', 'food-no');
+
+        function setupMutuallyExclusiveCheckboxes(id1, id2) {
+            const checkbox1 = document.getElementById(id1);
+            const checkbox2 = document.getElementById(id2);
+
+            checkbox1.addEventListener('change', function() {
+                if (this.checked) {
+                    checkbox2.checked = false;
+                }
+            });
+
+            checkbox2.addEventListener('change', function() {
+                if (this.checked) {
+                    checkbox1.checked = false;
+                }
+            });
+        }
+
+        // Компоненты крови
+        const donationTypes = document.querySelectorAll('.donation-type');
+        donationTypes.forEach(type => {
+            type.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateSelectedComponents();
+            });
+        });
+
+        function updateSelectedComponents() {
+            const selectedComponents = [];
+            document.querySelectorAll('.donation-type.selected').forEach(comp => {
+                selectedComponents.push(comp.dataset.component);
+            });
+            paymentComponentsField.value = JSON.stringify(selectedComponents);
+        }
+
+        // Автозаполнение при выборе донора
+        donorSelect.addEventListener('change', function() {
+            const donorId = this.value;
+            if (!donorId) {
+                documentIdField.value = '';
+                return;
+            }
+
+            // Запрашиваем информацию о доноре через API
+            fetch(`/app/api/donor/${donorId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        documentIdField.value = data.document_number || '';
+                    } else {
+                        alert('Ошибка при получении данных донора');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при запросе данных');
+                });
+        });
+
+        // Автозаполнение при выборе донации
+        donationSelect.addEventListener('change', function() {
+            const donationId = this.value;
+            if (!donationId) {
+                return;
+            }
+
+            // Запрашиваем информацию о донации через API
+            fetch(`/app/api/donation/${donationId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Устанавливаем донора
+                        if (data.donor_id) {
+                            donorSelect.value = data.donor_id;
+
+                            // Теперь запрашиваем информацию о доноре для документа
+                            fetch(`/app/api/donor/${data.donor_id}/`)
+                                .then(response => response.json())
+                                .then(donorData => {
+                                    if (donorData.success) {
+                                        documentIdField.value = donorData.document_number || '';
+                                    }
+                                });
+                        }
+
+                        // Устанавливаем компоненты
+                        if (data.components && data.components.length > 0) {
+                            // Очищаем текущий выбор
+                            document.querySelectorAll('.donation-type').forEach(option => {
+                                option.classList.remove('selected');
+                            });
+
+                            // Выбираем компоненты из донации
+                            data.components.forEach(component => {
+                                const option = document.querySelector(`.donation-type[data-component="${component}"]`);
+                                if (option) {
+                                    option.classList.add('selected');
+                                }
+                            });
+
+                            updateSelectedComponents();
+                        }
+
+                        // Устанавливаем платность донации
+                        if (data.payment_type === 'paid') {
+                            document.getElementById('paid-yes').checked = true;
+                            document.getElementById('paid-no').checked = false;
+                        } else {
+                            document.getElementById('paid-yes').checked = false;
+                            document.getElementById('paid-no').checked = true;
+                        }
+                    } else {
+                        alert('Ошибка при получении данных донации');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при запросе данных');
+                });
+        });
+
+        // Заполнение данных для редактирования
+        const editMode = {{ edit_mode|yesno:"true,false" }};
+        if (editMode) {
+            // Если есть данные предварительно выбранных компонентов, устанавливаем их
+            {% if selected_components %}
+            const selectedComponents = {{ selected_components|safe }};
+            if (selectedComponents && selectedComponents.length > 0) {
+                selectedComponents.forEach(component => {
+                    const option = document.querySelector(`.donation-type[data-component="${component}"]`);
+                    if (option) {
+                        option.classList.add('selected');
+                    }
+                });
+                updateSelectedComponents();
+            }
+            {% endif %}
+
+            // Устанавливаем значения формы из редактируемого платежа
+            {% if payment %}
+            // Устанавливаем донацию и донора
+            donationSelect.value = "{{ payment.donation.id }}";
+            donorSelect.value = "{{ payment.donor.id }}";
+            documentIdField.value = "{{ payment.document_id }}";
+
+            // Устанавливаем накопительную систему
+            const isAccumulative = "{{ payment.payment_method }}" === "accumulative";
+            document.getElementById('accumulative-yes').checked = isAccumulative;
+            document.getElementById('accumulative-no').checked = !isAccumulative;
+
+            // Устанавливаем платность донации
+            document.getElementById('paid-yes').checked = {{ payment.is_paid_donation|yesno:"true,false" }};
+            document.getElementById('paid-no').checked = !{{ payment.is_paid_donation|yesno:"true,false" }};
+
+            // Устанавливаем компенсацию за питание
+            document.getElementById('food-yes').checked = {{ payment.food_compensation|yesno:"true,false" }};
+            document.getElementById('food-no').checked = !{{ payment.food_compensation|yesno:"true,false" }};
+
+            // Устанавливаем тип выплаты
+            const paymentType = "{{ payment.payment_type }}";
+            if (paymentType) {
+                document.querySelector(`input[name="payment_type"][value="${paymentType}"]`).checked = true;
+            }
+
+            // Устанавливаем сумму
+            document.querySelector('input[name="amount"]').value = "{{ payment.amount }}";
+            {% endif %}
+        }
+
+        // Обработка формы
+        const paymentForm = document.getElementById('payment-form');
+        paymentForm.addEventListener('submit', function(event) {
+            // Проверяем обязательные параметры
+            const accumulativeYes = document.getElementById('accumulative-yes').checked;
+            const accumulativeNo = document.getElementById('accumulative-no').checked;
+            if (!accumulativeYes && !accumulativeNo) {
+                alert('Укажите, осуществляется ли выплата по накопительной системе');
+                event.preventDefault();
+                return;
+            }
+
+            const paidYes = document.getElementById('paid-yes').checked;
+            const paidNo = document.getElementById('paid-no').checked;
+            if (!paidYes && !paidNo) {
+                alert('Укажите, осуществлялась ли донация на платной основе');
+                event.preventDefault();
+                return;
+            }
+
+            const foodYes = document.getElementById('food-yes').checked;
+            const foodNo = document.getElementById('food-no').checked;
+            if (!foodYes && !foodNo) {
+                alert('Укажите, положена ли донору компенсация за питание');
+                event.preventDefault();
+                return;
+            }
+        });
+    });
+</script>
+</body>
+</html>

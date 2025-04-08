@@ -1,0 +1,321 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали выплаты</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        /* Включить те же стили, что и в payment_search.html */
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            height: 100%;
+            width: 100%;
+            background-color: white;
+        }
+        body {
+            display: flex;
+        }
+        .side-menu {
+            width: 160px;
+            background-color: #D9D9D9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .side-menu-item {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+        }
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
+        }
+        .side-menu-item:hover {
+            background-color: #F0F0F0;
+        }
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .button {
+            height: 45px;
+            padding: 0 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+        .button-primary {
+            background-color: #E60012;
+            color: white;
+            border: none;
+        }
+        .button-secondary {
+            background-color: white;
+            color: #E60012;
+            border: 1px solid #E60012;
+        }
+        .back-link {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .back-link a {
+            color: #E60012;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .back-arrow {
+            margin-right: 5px;
+            font-size: 18px;
+        }
+        .payment-details {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        .detail-group {
+            flex: 1;
+            min-width: 250px;
+        }
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .detail-value {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .payment-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        <style>
+    /* Дополняем существующие стили */
+    .applications-section {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .applications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .application-item {
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .application-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .application-name {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .application-date,
+    .application-document,
+    .application-expiration {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .no-applications {
+        color: #666;
+        font-style: italic;
+    }
+
+    .payment-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+</style>
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
+        </div>
+        <div class="side-menu-item-active" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
+        </div>
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
+        </div>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="back-link">
+            <a href="{% url 'payment_search' %}"><span class="back-arrow">‹</span> Вернуться к поиску</a>
+        </div>
+
+        <h1 class="page-title">Детали выплаты</h1>
+
+        <div class="payment-details">
+            <div class="detail-group">
+                <div class="detail-label">Донор</div>
+                <div class="detail-value">{{ payment.donor.get_full_name }}</div>
+
+                <div class="detail-label">Дата донации</div>
+                <div class="detail-value">{{ payment.donation.donation_date|date:"d.m.Y" }}</div>
+
+                <div class="detail-label">Тип выплаты</div>
+                <div class="detail-value">{{ payment.get_payment_type_display }}</div>
+            </div>
+
+            <div class="detail-group">
+                <div class="detail-label">Номер документа</div>
+                <div class="detail-value">{{ payment.document_id }}</div>
+
+                <div class="detail-label">Сумма выплаты</div>
+                <div class="detail-value">{{ payment.amount }} руб.</div>
+
+                <div class="detail-label">Дата выплаты</div>
+                <div class="detail-value">{{ payment.payment_date|date:"d.m.Y" }}</div>
+            </div>
+
+            <div class="detail-group">
+                <div class="detail-label">Срок истечения</div>
+                <div class="detail-value">{{ payment.expiration_date|date:"d.m.Y" }}</div>
+
+                <div class="detail-label">Платная донация</div>
+                <div class="detail-value">{% if payment.is_paid_donation %}Да{% else %}Нет{% endif %}</div>
+
+                <div class="detail-label">Компенсация за питание</div>
+                <div class="detail-value">{% if payment.food_compensation %}Да{% else %}Нет{% endif %}</div>
+            </div>
+        </div>
+
+<!-- Добавляем после блока с деталями выплаты -->
+<div class="applications-section">
+    <h2 class="section-title">Прикрепленные заявления</h2>
+    {% if applications %}
+        <div class="applications-list">
+            {% for app in applications %}
+                <div class="application-item">
+                    <div class="application-info">
+                        <div class="application-name">Заявление на выплату #{{ app.id }}</div>
+                        <div class="application-date">Загружено: {{ app.upload_date|date:"d.m.Y H:i" }}</div>
+                    </div>
+                    <a href="/app/payment_applications/{{ app.id }}" class="button button-secondary" target="_blank">Просмотреть</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-applications">Нет прикрепленных заявлений</p>
+    {% endif %}
+</div>
+
+<div class="payment-actions">
+    {% if is_can_edit %}
+        <a href="{% url 'payment_register' %}?edit={{ payment.id }}" class="button button-primary">Редактировать выплату</a>
+        <a href="{% url 'upload_payment_application' payment.id %}" class="button button-secondary">Прикрепить заявление</a>
+    {% endif %}
+    <button type="button" id="print-payment" class="button button-secondary">Распечатать квитанцию</button>
+</div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Функционал печати квитанции
+        document.getElementById('print-payment').addEventListener('click', function() {
+            window.print();
+        });
+    });
+</script>
+</body>
+</html>

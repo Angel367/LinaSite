@@ -5,19 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Поиск доноров</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
     <style>
         html {
             height: 100%;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             display: flex;
             margin: 0;
             height: 100vh;
             background-color: #F8F8F8;
         }
         .side-menu {
-            width: 130px;
+            width: 160px;
             background-color: #D9D9D9;
             display: flex;
             flex-direction: column;
@@ -26,8 +27,8 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
         .side-menu-item {
-            width: 60px;
-            height: 60px;
+            width: 70%;
+            height: 90%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -37,9 +38,9 @@
             transition: background-color 0.3s ease;
             background-color: white;
         }
-        .side-menu-item-first-last {
-            width: 60px;
-            height: 60px;
+        .side-menu-item-active {
+            width: 70%;
+            height: 90%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,13 +48,27 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            background-color: white;
+            border: 2px solid red; /* Добавленная строка */
+        }
+        .side-menu-item-first-last {
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-direction: column;
         }
         .side-menu-item:hover {
             background-color: #F0F0F0;
         }
-        .side-menu-item img, .side-menu-item-first-last img {
-            width: 30px;
-            height: 30px;
+        .side-menu-item img {
+            width: 80%;
+            height: 80%;
         }
         .content {
             flex-grow: 1;
@@ -290,26 +305,26 @@
 </head>
 <body>
     <div class="side-menu">
-        <div class="side-menu-item-first-last">
-            <img src="{% static 'menu/1.svg' %}" alt="Логотип">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/2.svg' %}" alt="Меню 1">
+        <div class="side-menu-item-active" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/2.svg' %}" alt="Icon 2">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/3.svg' %}" alt="Меню 2">
+        <div class="side-menu-item" onclick="window.location.href='/app/direction-main/'">
+            <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/4.svg' %}" alt="Меню 3">
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/5.svg' %}" alt="Меню 4">
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
         </div>
-        <div class="side-menu-item">
-            <img src="{% static 'menu/6.svg' %}" alt="Меню 5">
+        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+            <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
         </div>
-        <div class="side-menu-item-first-last">
-            <img src="{% static 'menu/7.svg' %}" alt="Меню 6">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
         </div>
     </div>
     
@@ -520,7 +535,7 @@
                             <div class="arrow-right">›</div>
                         `;
                         donorCard.addEventListener('click', function() {
-                            window.location.href = `/donor/${donor.id}/`;
+                            window.location.href = `/app/donor/${donor.id}/medical-card/`;
                         });
                         resultsContainer.appendChild(donorCard);
                     });
