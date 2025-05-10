@@ -71,6 +71,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'LinaSite.wsgi.application'
 
 
+APPEND_SLASH = True
+
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 

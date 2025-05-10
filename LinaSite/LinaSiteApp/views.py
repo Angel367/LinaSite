@@ -61,6 +61,7 @@ def check_creds(request):
         if cred['username'] == login and cred['password'] == password:
             # Устанавливаем куки для хранения информации о пользователе
             request.session['role'] = cred['role']
+            request.session['role_descr'] = cred['name']
             return JsonResponse({
                 'success': True,
                 'role': cred['role'],
@@ -72,7 +73,11 @@ def index(request):
     """
     Основная страница приложения.
     """
-    print(request.session['role'])
+    try:
+        print(request.session['role'])
+    except Exception as e:
+        print(e)
+        return redirect('/app/auth/')
     is_first_button = False
     if request.session['role'] == 'registrator' or request.session['role'] == 'specialist_med_cart':
         is_first_button = True

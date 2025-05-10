@@ -17,6 +17,17 @@
             height: 100vh;
             background-color: white;
         }
+        #user-info {
+            position: fixed;
+            top: 10px;
+            right: 15px;
+            z-index: 9999;
+            color: #333; /* или другой цвет, если фон темный */
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none; /* чтобы не мешал кликам по элементам под ним */
+        }
         .side-menu {
             width: 160px;
             background-color: #D9D9D9;
@@ -157,6 +168,10 @@
     </style>
 </head>
 <body>
+    <div id="user-info">
+      {{ request.session.role }}<br>
+        {{ request.session.role_descr }}
+    </div>
     <div class="side-menu">
         <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
             <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
