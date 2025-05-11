@@ -51,7 +51,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
             background-color: white;
-            border: 2px solid red; /* Добавленная строка */
+            border: 2px solid #FF2A23;
         }
         .side-menu-item-first-last {
             width: 90%;
@@ -81,25 +81,120 @@
         .page-title {
             font-size: 24px;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
-.dashboard {
-    display: grid;
-    grid-template-columns: 30% 70%;
-    gap: 20px;
-}
 
-.dashboard-column {
+        /* Стили для вкладок */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #666;
+            position: relative;
+            margin-right: 20px;
+        }
+        .tab.active {
+            color: #333;
+            font-weight: bold;
+        }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #FF2A23;
+        }
+
+        /* Стили для контента вкладок */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Стили для фильтров */
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 30px;
+        }
+        .filter-group {
+            padding: 15px;
+            border-radius: 8px;
+            width: 250px;
+        }
+        .filter-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+.all {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex-direction: row;
+    gap: 100px;
+    justify-content: center;
 }
 
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Стиль для кнопок выбора даты */
+        .date-picker {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+        }
+
+        /* Стиль для кнопок */
+        .action-button {
+            background-color: white;
+            border: 1px solid #FF2A23;
+            color: #FF2A23;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            width: 100%;
+        }
+        .action-button:hover {
+            background-color: #fff0f0;
+        }
+
+        /* Стили для графиков */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
         .chart-container {
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -107,97 +202,128 @@
         .chart-title {
             font-size: 16px;
             color: #333;
-            margin-bottom: 15px;
+            margin: 15px 0;
             text-align: center;
         }
         .chart-area {
             width: 100%;
-            height: 250px;
+            height: 260px;
+            max-height: 110%;
             position: relative;
         }
-        .chart-area canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        /* Стили для кругового индикатора */
-        .semi-donut {
+
+        /* Стиль для кругового индикатора */
+        .circle-donut {
             --percentage: 0;
             --fill: #FF2A23;
+            --bg: #ccc;
             width: 200px;
-            height: 100px;
+            height: 200px;
             position: relative;
-            border-radius: 100px 100px 0 0;
-            overflow: hidden;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--fill) 0% calc(var(--percentage) * 1%),
+                var(--bg) calc(var(--percentage) * 1%) 100%
+            );
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
-            box-sizing: border-box;
-            margin: 0 auto 30px;
+            margin: 20px auto;
         }
-        .semi-donut::after {
-            content: '';
+        .circle-donut::after {
+            content: attr(data-percentage) '%';
             position: absolute;
-            width: 170px;
-            height: 85px;
-            border-radius: 85px 85px 0 0;
+            width: 140px;
+            height: 140px;
             background: white;
-            top: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 3;
         }
-        .semi-donut-fill {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: #FF2A23;
-            transform-origin: center bottom;
-            transform: rotate(calc(1deg * (-180 + var(--percentage) * 1.8)));
-            transition: transform 0.5s ease;
-        }
-        .semi-donut-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: gray;
-            z-index: -1;
-        }
-        .semi-donut.donors {
-            --percentage: 62;
-        }
-        .semi-donut.approved {
-            --percentage: 80;
-        }
+
+        /* Стиль для полного кругового индикатора */
         .full-donut {
-    --percentage: 0;
-    --fill: #FF2A23;
-    --bg: #ccc;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: conic-gradient(
-        var(--fill) calc(var(--percentage) * 1%),
-        var(--bg) 0
-    );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    margin: 0 auto 30px;
-}
+            --percentage: 0;
+            --fill: #FF2A23;
+            --bg: #ccc;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--fill) 0% calc(var(--percentage) * 1%),
+                var(--bg) calc(var(--percentage) * 1%) 100%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 20px auto;
+        }
+        .full-donut::after {
+            content: attr(data-percentage) '%';
+            width: 140px;
+            height: 140px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 1;
+        }
 
-.full-donut::after {
-    content: '';
-    width: 140px;
-    height: 140px;
-    background: white;
-    border-radius: 50%;
-    position: absolute;
-    z-index: 1;
-}
+        /* Стиль для разноцветной круговой диаграммы */
+        .multi-color-donut {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
 
-.chart-title {
-    text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
-}
+        /* Легенда для многоцветной диаграммы */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        /* Стиль для отображения значений */
+        .value-display {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .value-display .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        .value-display .description {
+            font-size: 14px;
+            color: #666;
+            font-weight: bold;
+            margin-top: 5px;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
@@ -221,141 +347,565 @@
             <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
         </div>
         <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
-            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7">
+            <p>Выйти</p>
         </div>
     </div>
 
     <div class="main-content">
         <h1 class="page-title">Аналитика</h1>
 
-        <div class="dashboard">
-            <div class="chart-container">
-    <div class="full-donut" style="--percentage: 62;">
-        <!-- можно внутрь добавить текст, если нужно -->
+        <!-- Вкладки навигации -->
+        <div class="tabs">
+            <div class="tab active" data-tab="general">Общий отчет</div>
+            <div class="tab" data-tab="donors">Отчет о донорах</div>
+            <div class="tab" data-tab="donations">Отчет о донациях</div>
+            <div class="tab" data-tab="payments">Отчет о выплатах</div>
+        </div>
+        <div class="all">
+        <!-- Фильтры -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <div class="filter-title">Группировка</div>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="hours" name="grouping" value="hours">
+                        <label for="hours">Часы</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="days" name="grouping" value="days">
+                        <label for="days">Дни</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="weeks" name="grouping" value="weeks">
+                        <label for="weeks">Недели</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="months" name="grouping" value="months" checked>
+                        <label for="months">Месяцы</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="quarters" name="grouping" value="quarters">
+                        <label for="quarters">Кварталы</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-title">Сроки</div>
+                <a>Начальное время</a>
+                <input type="date" class="date-picker" id="start-date" placeholder="Выбрать начальное время">
+                <a>Конечное время</a>
+                <input type="date" class="date-picker" id="end-date" placeholder="Выбрать конечное время">
+
+                <div style="margin-top: 15px;">
+                    <button class="action-button" id="generate-report">Сформировать</button>
+                    <button class="action-button" id="export-pdf">Экспортировать в PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Содержимое вкладки "Общий отчет" -->
+        <div class="tab-content active" id="general-tab">
+            <div class="dashboard">
+                <!-- График общего количества доноров -->
+                <div class="chart-container" style="width: 140vh;">
+                    <div class="chart-area">
+                        <canvas id="total-donors-chart"></canvas>
+                    </div>
+                    <div class="chart-title">Общее количество доноров</div>
+                </div>
+
+                <!-- Показатель отношения средней суммы выплаты -->
+
+            </div>
+
+            <!-- Новый график - Процент потраченного бюджета -->
+            <div class="dashboard" style="margin-top: 20px;">
+                <div class="chart-container">
+                    <div class="full-donut" style="--percentage: 75;" data-percentage="75">
+                    </div>
+                    <div class="chart-title">Процент потраченного бюджета</div>
+                </div>
+<div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
+    <div class="value-display" style="text-align: center;">
+        <div class="value">2 548 руб.</div>
+        <div class="description">Показатель отношения средней суммы выплаты на допущенного донора</div>
     </div>
-    <div class="chart-title">Доноров вернулось в течение 6 месяцев</div>
 </div>
 
-<div class="chart-container">
-    <div class="chart-area">
-        <canvas id="donations-chart"></canvas>
-    </div>
-    <div class="chart-title">Количество донаций</div>
-</div>
+            </div>
+        </div>
 
-<div class="chart-container">
-    <div class="full-donut" style="--percentage: 52;">
-        <!-- можно внутрь добавить текст, если нужно -->
-    </div>
-    <div class="chart-title">Доля допущенных доноров</div>
-</div>
+        <!-- Содержимое вкладки "Отчет о донорах" -->
+        <div class="tab-content" id="donors-tab">
+            <div class="dashboard">
+                <!-- График количества штатных доноров -->
+                <div class="chart-container">
+                    <div class="chart-area">
+                        <canvas id="staff-donors-chart"></canvas>
+                    </div>
+                    <div class="chart-title">Количество штатных доноров</div>
+                </div>
+            </div>
 
-<div class="chart-container">
-    <div class="chart-area">
-        <canvas id="new-donors-chart"></canvas>
+            <div class="dashboard" style="margin-top: 20px;">
+                <!-- Доноров вернулось в течение 6 месяцев -->
+                <div class="chart-container">
+                    <div class="full-donut" style="--percentage: 62;" data-percentage="62">
+                    </div>
+                    <div class="chart-title">Доноров вернулось в течение 6 месяцев</div>
+                </div>
+
+                <!-- Доля допущенных доноров -->
+                <div class="chart-container">
+                    <div class="full-donut" style="--percentage: 52;" data-percentage="52">
+                    </div>
+                    <div class="chart-title">Доля допущенных доноров</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Содержимое вкладки "Отчет о донациях" -->
+        <div class="tab-content" id="donations-tab">
+            <div class="dashboard">
+                <!-- График количества осуществленных донаций -->
+                <div class="chart-container">
+                    <div class="chart-area">
+                        <canvas id="donations-count-chart"></canvas>
+                    </div>
+                    <div class="chart-title">Количество осуществленных донаций</div>
+                </div>
+
+                <!-- Типы осуществленных донаций -->
+                <div class="chart-container">
+                    <div class="chart-area">
+                        <canvas id="donation-types-chart"></canvas>
+                    </div>
+                    <div class="chart-title">Типы осуществленных донаций</div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #FF2A23;"></div>
+                            <span>Цельная кровь</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #FFD700;"></div>
+                            <span>Плазма</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #FF8C00;"></div>
+                            <span>Тромбоциты</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #4B0082;"></div>
+                            <span>Эритроциты</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #1E90FF;"></div>
+                            <span>Гранулоциты</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Содержимое вкладки "Отчет о выплатах" -->
+        <div class="tab-content" id="payments-tab">
+            <div class="dashboard">
+                <!-- График количества осуществленных выплат -->
+                <div class="chart-container">
+                    <div class="chart-area">
+                        <canvas id="payments-count-chart"></canvas>
+                    </div>
+                    <div class="chart-title">Количество осуществленных выплат</div>
+                </div>
+
+                <!-- График общей суммы выплат -->
+                <div class="chart-container">
+                    <div class="chart-area">
+                        <canvas id="payment-amount-chart"></canvas>
+                    </div>
+                    <div class="chart-title">Общая сумма выплат</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="chart-title">Количество новых доноров в месяц</div>
-</div>
     </div>
 
     <script>
-        // Данные для графиков (статические, как запрошено)
-        const months = ['Июль 24', 'Авг 24', 'Сен 24', 'Окт 24', 'Нояб 24', 'Дек 24', 'Янв 25', 'Фев 25'];
+        // Управление вкладками
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
 
-        // Данные для графика донаций
-        const donationsData = {
-            labels: months,
-            datasets: [{
-                label: 'Количество донаций',
-                data: [520, 650, 480, 530, 620, 380, 510, 680],
-                backgroundColor: '#FF2A23',
-                borderRadius: 5,
-                borderSkipped: false,
-                barThickness: 120
-            }]
-        };
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Убираем активный класс со всех вкладок и контента
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
 
-        // Данные для графика новых доноров
-        const newDonorsData = {
-            labels: months,
-            datasets: [{
-                label: 'Количество новых доноров',
-                data: [230, 380, 210, 260, 340, 180, 250, 360],
-                backgroundColor: '#FF2A23',
-                borderRadius: 5,
-                borderSkipped: false,
-                barThickness: 120
-            }]
-        };
+                    // Добавляем активный класс на выбранную вкладку
+                    tab.classList.add('active');
 
-        // Общие настройки для графиков
-        const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
+                    // Показываем соответствующий контент
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+
+                    // Перерисовываем графики для корректного отображения размеров
+                    updateCharts();
+                });
+            });
+
+            // Функция для генерации случайных данных
+            function getRandomData(min, max, count) {
+                return Array.from({length: count}, () => Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+
+            // Общие настройки для столбчатых графиков
+            const barChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#333',
+                        bodyColor: '#333',
+                        borderColor: '#FF2A23',
+                        borderWidth: 2,
+                        displayColors: false,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' шт.';
+                            }
+                        }
+                    }
                 },
-                tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    titleColor: '#333',
-                    bodyColor: '#333',
-                    borderColor: '#FF2A23',
-                    borderWidth: 3,
-                    displayColors: false,
-                    padding: 10,
-                    callbacks: {
-                        label: function(context) {
-                            return context.parsed.y + ' шт.';
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            display: false
                         }
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
+            };
+
+            // Общие настройки для линейных графиков
+            const lineChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
                         display: false
                     },
-                    ticks: {
-                        display: false
-                    },
-                    border: {
-                        display: false
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#333',
+                        bodyColor: '#333',
+                        borderColor: '#FF2A23',
+                        borderWidth: 2,
+                        displayColors: false,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' млн.';
+                            }
+                        }
                     }
                 },
-                x: {
-                    grid: {
-                        display: false
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#eee'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' млн';
+                            }
+                        }
                     },
-                    border: {
-                        display: false
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        borderColor: '#FF2A23',
+                        tension: 0.4
+                    },
+                    point: {
+                        backgroundColor: '#FF2A23',
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        radius: 5
                     }
                 }
+            };
+
+            // Периоды для различных типов группировки
+            const periodLabels = {
+                hours: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '00:00', '04:00'],
+                days: ['07.05', '08.05', '09.05', '10.05', '11.05', '12.05', '13.05', '14.05'],
+                weeks: ['26-01 апр', '02-08 апр', '09-15 апр', '16-22 апр', '23-29 апр', '30-06 мая', '07-13 мая', '14-20 мая'],
+                months: ['Окт 24', 'Нояб 24', 'Дек 24', 'Янв 25', 'Фев 25', 'Мар 25', 'Апр 25', 'Май 25'],
+                quarters: ['Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026']
+            };
+
+            // Текущие метки периодов (по умолчанию месяцы)
+            let currentLabels = periodLabels.months;
+
+            // Объект для хранения всех графиков
+            const charts = {};
+
+            // Плагин для отображения значений над столбцами с проверкой высоты
+const datalabelsPlugin = {
+    id: 'datalabels',
+    afterDatasetsDraw(chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = 'bold 12px Montserrat';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        chart.data.datasets.forEach((dataset, i) => {
+            const meta = chart.getDatasetMeta(i);
+            if (!meta.hidden) {
+                meta.data.forEach((bar, index) => {
+                    const data = dataset.data[index];
+                    const x = bar.x;
+                    const y = bar.y + (bar.base - bar.y) / 2; // Центр столбца по высоте
+
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(data, x, y);
+                });
             }
-        };
+        });
 
-        // Инициализация графиков
-        document.addEventListener('DOMContentLoaded', function() {
-            // График донаций
-            new Chart(
-                document.getElementById('donations-chart').getContext('2d'),
-                {
-                    type: 'bar',
-                    data: donationsData,
-                    options: chartOptions
-                }
-            );
+        ctx.restore();
+    }
+};
 
-            // График новых доноров
-            new Chart(
-                document.getElementById('new-donors-chart').getContext('2d'),
-                {
-                    type: 'bar',
-                    data: newDonorsData,
-                    options: chartOptions
-                }
-            );
+
+
+            // Инициализация всех графиков
+            function initCharts() {
+                // Общее количество доноров
+                charts.totalDonors = new Chart(
+                    document.getElementById('total-donors-chart').getContext('2d'),
+                    {
+                        type: 'bar',
+                        data: {
+                            labels: currentLabels,
+                            datasets: [{
+                                data: getRandomData(300, 600, 8),
+                                backgroundColor: '#FF2A23',
+                                borderRadius: 5,
+                                borderSkipped: false,
+                                barThickness: 135
+                            }]
+                        },
+                        options: barChartOptions,
+                        plugins: [datalabelsPlugin]
+                    }
+                );
+
+                // Количество штатных доноров
+                charts.staffDonors = new Chart(
+                    document.getElementById('staff-donors-chart').getContext('2d'),
+                    {
+                        type: 'bar',
+                        data: {
+                            labels: currentLabels,
+                            datasets: [{
+                                data: getRandomData(200, 600, 8),
+                                backgroundColor: '#FF2A23',
+                                borderRadius: 5,
+                                borderSkipped: false,
+                                barThickness: 35
+                            }]
+                        },
+                        options: barChartOptions,
+                        plugins: [datalabelsPlugin]
+                    }
+                );
+
+                // Количество осуществленных донаций
+                charts.donationsCount = new Chart(
+                    document.getElementById('donations-count-chart').getContext('2d'),
+                    {
+                        type: 'bar',
+                        data: {
+                            labels: currentLabels,
+                            datasets: [{
+                                data: getRandomData(400, 700, 8),
+                                backgroundColor: '#FF2A23',
+                                borderRadius: 5,
+                                borderSkipped: false,
+                                barThickness: 35
+                            }]
+                        },
+                        options: barChartOptions,
+                        plugins: [datalabelsPlugin]
+                    }
+                );
+
+                // Типы осуществленных донаций (кастомная круговая диаграмма без чисел внутри)
+                const donationTypesChart = document.getElementById('donation-types-chart').getContext('2d');
+                const donationData = getRandomData(10, 35, 5);
+
+                charts.donationTypes = new Chart(donationTypesChart, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Цельная кровь', 'Плазма', 'Тромбоциты', 'Эритроциты', 'Гранулоциты'],
+                        datasets: [{
+                            data: donationData,
+                            backgroundColor: ['#FF2A23', '#FFD700', '#FF8C00', '#4B0082', '#1E90FF'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const dataset = context.dataset;
+                                        const total = dataset.data.reduce((acc, data) => acc + data, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${percentage}%`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+
+                // Количество осуществленных выплат
+                charts.paymentsCount = new Chart(
+                    document.getElementById('payments-count-chart').getContext('2d'),
+                    {
+                        type: 'bar',
+                        data: {
+                            labels: currentLabels,
+                            datasets: [{
+                                data: getRandomData(300, 700, 8),
+                                backgroundColor: '#FF2A23',
+                                borderRadius: 5,
+                                borderSkipped: false,
+                                barThickness: 35
+                            }]
+                        },
+                        options: barChartOptions,
+                        plugins: [datalabelsPlugin]
+                    }
+                );
+
+                // Общая сумма выплат (линейный график)
+                charts.paymentAmount = new Chart(
+                    document.getElementById('payment-amount-chart').getContext('2d'),
+                    {
+                        type: 'line',
+                        data: {
+                            labels: currentLabels,
+                            datasets: [{
+                                data: getRandomData(1, 10, 8),
+                                fill: false
+                            }]
+                        },
+                        options: lineChartOptions,
+                        plugins: [datalabelsPlugin]
+                    }
+                );
+            }
+
+            // Обновление данных графиков случайными значениями и обновление меток
+            function updateCharts() {
+                // Получаем выбранную группировку
+                const selectedGrouping = document.querySelector('input[name="grouping"]:checked').value;
+                currentLabels = periodLabels[selectedGrouping];
+
+                Object.values(charts).forEach(chart => {
+                    if (chart.config.type === 'bar' || chart.config.type === 'line') {
+                        // Обновляем метки
+                        chart.data.labels = currentLabels;
+
+                        // Обновляем данные
+                        chart.data.datasets[0].data = getRandomData(
+                            chart.config.type === 'line' ? 1 : 200,
+                            chart.config.type === 'line' ? 10 : 800,
+                            8
+                        );
+                    } else if (chart.config.type === 'doughnut') {
+                        chart.data.datasets[0].data = getRandomData(10, 35, 5);
+                    }
+                    chart.update();
+                });
+
+                // Обновление значений для круговых индикаторов
+                document.querySelectorAll('.full-donut').forEach(donut => {
+                    const percentage = Math.floor(Math.random() * 41) + 40; // От 40 до 80
+                    donut.style.setProperty('--percentage', percentage);
+                    donut.setAttribute('data-percentage', percentage);
+                });
+
+                // Обновление значения для показателя суммы
+                document.querySelector('.value').textContent =
+                    Math.floor(Math.random() * 3000 + 1500) + ' руб.';
+            }
+
+            // Инициализация графиков после загрузки DOM
+            initCharts();
+
+            // Привязка функции обновления данных к изменению группировки
+            document.querySelectorAll('input[name="grouping"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updateCharts();
+                });
+            });
+
+            // Привязка функции обновления данных к кнопке "Сформировать"
+            document.getElementById('generate-report').addEventListener('click', updateCharts);
+
+            // Функция экспорта в PDF через печать браузера
+            document.getElementById('export-pdf').addEventListener('click', function() {
+                window.print();
+            });
+
+            // Установка дат с учетом того, что сегодня 14.05.2025
+            const today = new Date('2025-05-14');
+            const oneMonthAgo = new Date('2025-05-14');
+            oneMonthAgo.setMonth(today.getMonth() - 1);
+
+            document.getElementById('start-date').valueAsDate = oneMonthAgo;
+            document.getElementById('end-date').valueAsDate = today;
         });
     </script>
 </body>
