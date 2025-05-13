@@ -281,9 +281,24 @@
             color: #777;
             font-size: 16px;
         }
+                #user-info {
+            position: fixed;
+            top: 10px;
+            right: 15px;
+            z-index: 9999;
+            color: #333; /* или другой цвет, если фон темный */
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none; /* чтобы не мешал кликам по элементам под ним */
+        }
     </style>
 </head>
 <body>
+    <div id="user-info">
+      {{ request.session.role }}<br>
+        {{ request.session.role_descr }}
+    </div>
     <div class="side-menu">
         <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
             <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
@@ -294,16 +309,16 @@
         <div class="side-menu-item-active" onclick="window.location.href='/app/direction/menu'">
             <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
         </div>
-        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+        <div class="side-menu-item" onclick="window.location.href='/app/donation'">
             <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
         </div>
-        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+        <div class="side-menu-item" onclick="window.location.href='/app/payment/menu/'">
             <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
         </div>
-        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+        <div class="side-menu-item" onclick="window.location.href='/app/analytics'">
             <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
         </div>
-        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/logout'">
             <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
         </div>
     </div>

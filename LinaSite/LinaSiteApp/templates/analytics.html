@@ -324,9 +324,24 @@
             margin-left: auto;
             margin-right: auto;
         }
+                #user-info {
+            position: fixed;
+            top: 10px;
+            right: 15px;
+            z-index: 9999;
+            color: #333; /* или другой цвет, если фон темный */
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none; /* чтобы не мешал кликам по элементам под ним */
+        }
     </style>
 </head>
 <body>
+    <div id="user-info">
+      {{ request.session.role }}<br>
+        {{ request.session.role_descr }}
+    </div>
     <div class="side-menu">
         <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
             <img src="{% static 'menu/1.svg' %}" alt="Icon 1">
@@ -337,18 +352,17 @@
         <div class="side-menu-item" onclick="window.location.href='/app/direction/menu'">
             <img src="{% static 'menu/3.svg' %}" alt="Icon 3">
         </div>
-        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+        <div class="side-menu-item" onclick="window.location.href='/app/donation'">
             <img src="{% static 'menu/4.svg' %}" alt="Icon 4">
         </div>
-        <div class="side-menu-item" onclick="window.location.href='https://www.google.com'">
+        <div class="side-menu-item" onclick="window.location.href='/app/payment/menu/'">
             <img src="{% static 'menu/5.svg' %}" alt="Icon 5">
         </div>
-        <div class="side-menu-item-active" onclick="window.location.href='https://www.google.com'">
+        <div class="side-menu-item-active" onclick="window.location.href='/app/analytics'">
             <img src="{% static 'menu/6.svg' %}" alt="Icon 6">
         </div>
-        <div class="side-menu-item-first-last" onclick="window.location.href='/app/main'">
-            <img src="{% static 'menu/7.svg' %}" alt="Icon 7">
-            <p>Выйти</p>
+        <div class="side-menu-item-first-last" onclick="window.location.href='/app/logout'">
+            <img src="{% static 'menu/7.svg' %}" alt="Icon 7"><p>Выйти</p>
         </div>
     </div>
 
@@ -394,9 +408,9 @@
             <div class="filter-group">
                 <div class="filter-title">Сроки</div>
                 <a>Начальное время</a>
-                <input type="date" class="date-picker" id="start-date" placeholder="Выбрать начальное время">
+                <input type="datetime-local" class="date-picker" id="start-date" placeholder="Выбрать начальное время">
                 <a>Конечное время</a>
-                <input type="date" class="date-picker" id="end-date" placeholder="Выбрать конечное время">
+                <input type="datetime-local" class="date-picker" id="end-date" placeholder="Выбрать конечное время">
 
                 <div style="margin-top: 15px;">
                     <button class="action-button" id="generate-report">Сформировать</button>
@@ -441,7 +455,7 @@
         <div class="tab-content" id="donors-tab">
             <div class="dashboard">
                 <!-- График количества штатных доноров -->
-                <div class="chart-container">
+                <div class="chart-container" style="width: 140vh;">
                     <div class="chart-area">
                         <canvas id="staff-donors-chart"></canvas>
                     </div>
@@ -468,17 +482,18 @@
 
         <!-- Содержимое вкладки "Отчет о донациях" -->
         <div class="tab-content" id="donations-tab">
+            <div style="align-items: center; justify-content: center;">
             <div class="dashboard">
                 <!-- График количества осуществленных донаций -->
-                <div class="chart-container">
+                <div class="chart-container" style="width: 140vh; justify-content: center;">
                     <div class="chart-area">
                         <canvas id="donations-count-chart"></canvas>
                     </div>
                     <div class="chart-title">Количество осуществленных донаций</div>
                 </div>
-
+</div>
                 <!-- Типы осуществленных донаций -->
-                <div class="chart-container">
+                <div class="chart-container" style="width: 140vh; justify-content: center; align-items: center">
                     <div class="chart-area">
                         <canvas id="donation-types-chart"></canvas>
                     </div>
@@ -512,8 +527,9 @@
         <!-- Содержимое вкладки "Отчет о выплатах" -->
         <div class="tab-content" id="payments-tab">
             <div class="dashboard">
+                <div>
                 <!-- График количества осуществленных выплат -->
-                <div class="chart-container">
+                <div class="chart-container" style="width: 140vh; justify-content: center;">
                     <div class="chart-area">
                         <canvas id="payments-count-chart"></canvas>
                     </div>
@@ -527,7 +543,7 @@
                     </div>
                     <div class="chart-title">Общая сумма выплат</div>
                 </div>
-            </div>
+            </div></div>
         </div>
     </div>
     </div>
@@ -537,6 +553,39 @@
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.tab');
             const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Элементы выбора даты
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+            
+            // Текущая дата
+            const now = new Date();
+            const maxDateTime = new Date(now);
+            maxDateTime.setMinutes(maxDateTime.getMinutes() - maxDateTime.getMinutes() % 5); // Округляем до ближайших 5 минут
+            const maxDateTimeStr = maxDateTime.toISOString().slice(0, 16); // Формат YYYY-MM-DDTHH:MM
+            
+            // Установка ограничения на выбор дат в будущем
+            startDateInput.max = maxDateTimeStr;
+            endDateInput.max = maxDateTimeStr;
+
+            // Обработчики событий для инпутов даты и времени
+            startDateInput.addEventListener('change', function() {
+                if (this.value) {
+                    endDateInput.disabled = true;
+                    updateLabelsBasedOnDate(this.value, 'start');
+                } else {
+                    endDateInput.disabled = false;
+                }
+            });
+
+            endDateInput.addEventListener('change', function() {
+                if (this.value) {
+                    startDateInput.disabled = true;
+                    updateLabelsBasedOnDate(this.value, 'end');
+                } else {
+                    startDateInput.disabled = false;
+                }
+            });
 
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
@@ -556,10 +605,170 @@
                 });
             });
 
-            // Функция для генерации случайных данных
-            function getRandomData(min, max, count) {
-                return Array.from({length: count}, () => Math.floor(Math.random() * (max - min + 1)) + min);
+            // Функция для генерации случайных данных с учетом типа группировки
+            function getRandomData(groupType) {
+                const ranges = {
+                    hours: { min: 1, max: 10 },
+                    days: { min: 30, max: 60 },
+                    weeks: { min: 150, max: 250 },
+                    months: { min: 500, max: 800 },
+                    quarters: { min: 1500, max: 2500 }
+                };
+
+                const { min, max } = ranges[groupType];
+                return Array.from({length: 8}, () => Math.floor(Math.random() * (max - min + 1)) + min);
             }
+
+            // Функция для проверки, не уходит ли дата в будущее
+            function isFuture(date) {
+                return new Date(date) > now;
+            }
+
+            // Функция для обновления меток на основе выбранной даты
+            function updateLabelsBasedOnDate(dateTimeStr, type) {
+                const dateTime = new Date(dateTimeStr);
+                let labels = [];
+                const currentGroupType = document.querySelector('input[name="grouping"]:checked').value;
+                
+                // Определяем интервал для группировки
+                const intervals = {
+                    hours: { unit: 'hours', amount: 1 },
+                    days: { unit: 'days', amount: 1 },
+                    weeks: { unit: 'days', amount: 7 },
+                    months: { unit: 'months', amount: 1 },
+                    quarters: { unit: 'months', amount: 3 }
+                };
+                
+                const interval = intervals[currentGroupType];
+                
+                // Проверяем, можно ли использовать выбранную группировку с учетом даты
+                // Для начальной даты проверяем, что 8 периодов не уходит в будущее
+                if (type === 'start') {
+                    // Создаем дату для последнего периода (начальная дата + 7 периодов)
+                    const lastDate = new Date(dateTime);
+                    for (let i = 0; i < 7; i++) {
+                        if (interval.unit === 'hours') lastDate.setHours(lastDate.getHours() + interval.amount);
+                        else if (interval.unit === 'days') lastDate.setDate(lastDate.getDate() + interval.amount);
+                        else if (interval.unit === 'months') lastDate.setMonth(lastDate.getMonth() + interval.amount);
+                    }
+                    
+                    // Если последний период в будущем, предупреждаем пользователя
+                    if (isFuture(lastDate)) {
+                        alert(`Для выбранной даты и группировки по "${currentGroupType}" часть данных уходит в будущее. Пожалуйста, выберите более раннюю дату или другую группировку.`);
+                        return false;
+                    }
+                    
+                    // Генерируем 8 последовательных периодов
+                    for (let i = 0; i < 8; i++) {
+                        const date = new Date(dateTime);
+                        if (interval.unit === 'hours') date.setHours(date.getHours() + i * interval.amount);
+                        else if (interval.unit === 'days') date.setDate(date.getDate() + i * interval.amount);
+                        else if (interval.unit === 'months') date.setMonth(date.getMonth() + i * interval.amount);
+                        
+                        // Форматируем дату в зависимости от группировки
+                        if (currentGroupType === 'hours') {
+                            labels.push(date.getHours().toString().padStart(2, '0') + ':00');
+                        } else if (currentGroupType === 'days') {
+                            labels.push(date.getDate().toString().padStart(2, '0') + '.' + (date.getMonth() + 1).toString().padStart(2, '0'));
+                        } else if (currentGroupType === 'weeks') {
+                            // Начало недели (пн)
+                            const startOfWeek = new Date(date);
+                            startOfWeek.setDate(date.getDate() - date.getDay() + 1);
+                            // Конец недели (вс)
+                            const endOfWeek = new Date(startOfWeek);
+                            endOfWeek.setDate(startOfWeek.getDate() + 6);
+                            
+                            labels.push(startOfWeek.getDate().toString().padStart(2, '0') + '-' + 
+                                        endOfWeek.getDate().toString().padStart(2, '0') + ' ' + 
+                                        ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][endOfWeek.getMonth()]);
+                        } else if (currentGroupType === 'months') {
+                            labels.push(['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'][date.getMonth()] + 
+                                        ' ' + date.getFullYear().toString().substr(2));
+                        } else if (currentGroupType === 'quarters') {
+                            const quarter = Math.floor(date.getMonth() / 3) + 1;
+                            labels.push('Q' + quarter + ' ' + date.getFullYear());
+                        }
+                    }
+                } else { // end date
+                    // Генерируем 8 последовательных периодов назад от конечной даты
+                    for (let i = 7; i >= 0; i--) {
+                        const date = new Date(dateTime);
+                        if (interval.unit === 'hours') date.setHours(date.getHours() - i * interval.amount);
+                        else if (interval.unit === 'days') date.setDate(date.getDate() - i * interval.amount);
+                        else if (interval.unit === 'months') date.setMonth(date.getMonth() - i * interval.amount);
+                        
+                        // Форматируем дату в зависимости от группировки
+                        if (currentGroupType === 'hours') {
+                            labels.push(date.getHours().toString().padStart(2, '0') + ':00');
+                        } else if (currentGroupType === 'days') {
+                            labels.push(date.getDate().toString().padStart(2, '0') + '.' + (date.getMonth() + 1).toString().padStart(2, '0'));
+                        } else if (currentGroupType === 'weeks') {
+                            // Начало недели (пн)
+                            const startOfWeek = new Date(date);
+                            startOfWeek.setDate(date.getDate() - date.getDay() + 1);
+                            // Конец недели (вс)
+                            const endOfWeek = new Date(startOfWeek);
+                            endOfWeek.setDate(startOfWeek.getDate() + 6);
+                            
+                            labels.push(startOfWeek.getDate().toString().padStart(2, '0') + '-' + 
+                                        endOfWeek.getDate().toString().padStart(2, '0') + ' ' + 
+                                        ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][endOfWeek.getMonth()]);
+                        } else if (currentGroupType === 'months') {
+                            labels.push(['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'][date.getMonth()] + 
+                                        ' ' + date.getFullYear().toString().substr(2));
+                        } else if (currentGroupType === 'quarters') {
+                            const quarter = Math.floor(date.getMonth() / 3) + 1;
+                            labels.push('Q' + quarter + ' ' + date.getFullYear());
+                        }
+                    }
+                }
+                
+                // Обновляем метки на всех графиках
+                Object.values(charts).forEach(chart => {
+                    if (chart.config.type === 'bar' || chart.config.type === 'line') {
+                        chart.data.labels = labels;
+                        chart.update();
+                    }
+                });
+                
+                currentLabels = labels;
+                return true;
+            }
+
+            // Текущие метки периодов (по умолчанию месяцы)
+            let currentLabels = [];
+            let currentGroupType = 'months';
+
+            // Объект для хранения всех графиков
+            const charts = {};
+
+            // Плагин для отображения значений над столбцами
+            const datalabelsPlugin = {
+                id: 'datalabels',
+                afterDatasetsDraw(chart) {
+                    const ctx = chart.ctx;
+                    ctx.save();
+                    ctx.font = 'bold 12px Montserrat';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    chart.data.datasets.forEach((dataset, i) => {
+                        const meta = chart.getDatasetMeta(i);
+                        if (!meta.hidden) {
+                            meta.data.forEach((bar, index) => {
+                                const data = dataset.data[index];
+                                const x = bar.x;
+                                const y = bar.y + (bar.base - bar.y) / 2; // Центр столбца по высоте
+
+                                ctx.fillStyle = '#fff';
+                                ctx.fillText(data, x, y);
+                            });
+                        }
+                    });
+
+                    ctx.restore();
+                }
+            };
 
             // Общие настройки для столбчатых графиков
             const barChartOptions = {
@@ -665,51 +874,18 @@
 
             // Периоды для различных типов группировки
             const periodLabels = {
-                hours: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '00:00', '04:00'],
+                hours: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
                 days: ['07.05', '08.05', '09.05', '10.05', '11.05', '12.05', '13.05', '14.05'],
                 weeks: ['26-01 апр', '02-08 апр', '09-15 апр', '16-22 апр', '23-29 апр', '30-06 мая', '07-13 мая', '14-20 мая'],
                 months: ['Окт 24', 'Нояб 24', 'Дек 24', 'Янв 25', 'Фев 25', 'Мар 25', 'Апр 25', 'Май 25'],
-                quarters: ['Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026']
+                quarters: ['Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025']
             };
-
-            // Текущие метки периодов (по умолчанию месяцы)
-            let currentLabels = periodLabels.months;
-
-            // Объект для хранения всех графиков
-            const charts = {};
-
-            // Плагин для отображения значений над столбцами с проверкой высоты
-const datalabelsPlugin = {
-    id: 'datalabels',
-    afterDatasetsDraw(chart) {
-        const ctx = chart.ctx;
-        ctx.save();
-        ctx.font = 'bold 12px Montserrat';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        chart.data.datasets.forEach((dataset, i) => {
-            const meta = chart.getDatasetMeta(i);
-            if (!meta.hidden) {
-                meta.data.forEach((bar, index) => {
-                    const data = dataset.data[index];
-                    const x = bar.x;
-                    const y = bar.y + (bar.base - bar.y) / 2; // Центр столбца по высоте
-
-                    ctx.fillStyle = '#fff';
-                    ctx.fillText(data, x, y);
-                });
-            }
-        });
-
-        ctx.restore();
-    }
-};
-
-
 
             // Инициализация всех графиков
             function initCharts() {
+                // Установка начальных меток
+                currentLabels = periodLabels[currentGroupType];
+                
                 // Общее количество доноров
                 charts.totalDonors = new Chart(
                     document.getElementById('total-donors-chart').getContext('2d'),
@@ -718,7 +894,7 @@ const datalabelsPlugin = {
                         data: {
                             labels: currentLabels,
                             datasets: [{
-                                data: getRandomData(300, 600, 8),
+                                data: getRandomData(currentGroupType),
                                 backgroundColor: '#FF2A23',
                                 borderRadius: 5,
                                 borderSkipped: false,
@@ -738,11 +914,11 @@ const datalabelsPlugin = {
                         data: {
                             labels: currentLabels,
                             datasets: [{
-                                data: getRandomData(200, 600, 8),
+                                data: getRandomData(currentGroupType),
                                 backgroundColor: '#FF2A23',
                                 borderRadius: 5,
                                 borderSkipped: false,
-                                barThickness: 35
+                                barThickness: 135
                             }]
                         },
                         options: barChartOptions,
@@ -758,11 +934,11 @@ const datalabelsPlugin = {
                         data: {
                             labels: currentLabels,
                             datasets: [{
-                                data: getRandomData(400, 700, 8),
+                                data: getRandomData(currentGroupType),
                                 backgroundColor: '#FF2A23',
                                 borderRadius: 5,
                                 borderSkipped: false,
-                                barThickness: 35
+                                barThickness: 135
                             }]
                         },
                         options: barChartOptions,
@@ -770,43 +946,43 @@ const datalabelsPlugin = {
                     }
                 );
 
-                // Типы осуществленных донаций (кастомная круговая диаграмма без чисел внутри)
-                const donationTypesChart = document.getElementById('donation-types-chart').getContext('2d');
-                const donationData = getRandomData(10, 35, 5);
-
-                charts.donationTypes = new Chart(donationTypesChart, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Цельная кровь', 'Плазма', 'Тромбоциты', 'Эритроциты', 'Гранулоциты'],
-                        datasets: [{
-                            data: donationData,
-                            backgroundColor: ['#FF2A23', '#FFD700', '#FF8C00', '#4B0082', '#1E90FF'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.parsed || 0;
-                                        const dataset = context.dataset;
-                                        const total = dataset.data.reduce((acc, data) => acc + data, 0);
-                                        const percentage = Math.round((value / total) * 100);
-                                        return `${label}: ${percentage}%`;
+                // Типы осуществленных донаций
+                charts.donationTypes = new Chart(
+                    document.getElementById('donation-types-chart').getContext('2d'),
+                    {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Цельная кровь', 'Плазма', 'Тромбоциты', 'Эритроциты', 'Гранулоциты'],
+                            datasets: [{
+                                data: [35, 25, 20, 12, 8],
+                                backgroundColor: ['#FF2A23', '#FFD700', '#FF8C00', '#4B0082', '#1E90FF'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const dataset = context.dataset;
+                                            const total = dataset.data.reduce((acc, data) => acc + data, 0);
+                                            const percentage = Math.round((value / total) * 100);
+                                            return `${label}: ${percentage}%`;
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        cutout: '60%'
+                            },
+                            cutout: '60%'
+                        }
                     }
-                });
+                );
 
                 // Количество осуществленных выплат
                 charts.paymentsCount = new Chart(
@@ -816,11 +992,11 @@ const datalabelsPlugin = {
                         data: {
                             labels: currentLabels,
                             datasets: [{
-                                data: getRandomData(300, 700, 8),
+                                data: getRandomData(currentGroupType),
                                 backgroundColor: '#FF2A23',
                                 borderRadius: 5,
                                 borderSkipped: false,
-                                barThickness: 35
+                                barThickness: 135
                             }]
                         },
                         options: barChartOptions,
@@ -836,38 +1012,73 @@ const datalabelsPlugin = {
                         data: {
                             labels: currentLabels,
                             datasets: [{
-                                data: getRandomData(1, 10, 8),
+                                data: getRandomData(currentGroupType).map(val => val / 100), // Уменьшаем для миллионов
                                 fill: false
                             }]
                         },
-                        options: lineChartOptions,
-                        plugins: [datalabelsPlugin]
+                        options: lineChartOptions
                     }
                 );
             }
 
-            // Обновление данных графиков случайными значениями и обновление меток
+            // Обновление данных графиков с учетом типа группировки
             function updateCharts() {
                 // Получаем выбранную группировку
-                const selectedGrouping = document.querySelector('input[name="grouping"]:checked').value;
-                currentLabels = periodLabels[selectedGrouping];
+                currentGroupType = document.querySelector('input[name="grouping"]:checked').value;
+                
+                // Если одна из дат выбрана, используем ее для генерации меток
+                let updated = false;
+                
+                if (startDateInput.value && !startDateInput.disabled) {
+                    updated = updateLabelsBasedOnDate(startDateInput.value, 'start');
+                } else if (endDateInput.value && !endDateInput.disabled) {
+                    updated = updateLabelsBasedOnDate(endDateInput.value, 'end');
+                }
+                
+                // Если не было обновления через дату или оно не удалось, используем стандартные метки
+                if (!updated) {
+                    currentLabels = periodLabels[currentGroupType];
+                    
+                    // Обновляем столбчатые и линейные графики
+                    Object.entries(charts).forEach(([key, chart]) => {
+                        if (chart.config.type === 'bar' || chart.config.type === 'line') {
+                            // Обновляем метки
+                            chart.data.labels = currentLabels;
 
-                Object.values(charts).forEach(chart => {
-                    if (chart.config.type === 'bar' || chart.config.type === 'line') {
-                        // Обновляем метки
-                        chart.data.labels = currentLabels;
+                            // Обновляем данные с учетом типа группировки
+                            let data = getRandomData(currentGroupType);
 
-                        // Обновляем данные
-                        chart.data.datasets[0].data = getRandomData(
-                            chart.config.type === 'line' ? 1 : 200,
-                            chart.config.type === 'line' ? 10 : 800,
-                            8
-                        );
-                    } else if (chart.config.type === 'doughnut') {
-                        chart.data.datasets[0].data = getRandomData(10, 35, 5);
-                    }
-                    chart.update();
-                });
+                            if (chart.config.type === 'line') {
+                                // Для линейного графика делим на 100, чтобы получить значения в миллионах
+                                data = data.map(val => val / 100);
+                            }
+
+                            chart.data.datasets[0].data = data;
+
+                            // Обновляем толщину столбцов в зависимости от количества (для столбчатых графиков)
+                            if (chart.config.type === 'bar') {
+                                chart.data.datasets[0].barThickness = 135;
+                            }
+
+                            chart.update();
+                        }
+                    });
+                }
+
+                // Обновляем круговой график типов донаций (случайными долями)
+                if (charts.donationTypes) {
+                    const total = 100;
+                    const firstValue = Math.floor(Math.random() * 30) + 25; // 25-55%
+                    const secondValue = Math.floor(Math.random() * 20) + 15; // 15-35%
+                    const thirdValue = Math.floor(Math.random() * 15) + 10; // 10-25%
+                    const fourthValue = Math.floor(Math.random() * 10) + 5; // 5-15%
+                    const fifthValue = total - firstValue - secondValue - thirdValue - fourthValue;
+
+                    charts.donationTypes.data.datasets[0].data = [
+                        firstValue, secondValue, thirdValue, fourthValue, fifthValue
+                    ];
+                    charts.donationTypes.update();
+                }
 
                 // Обновление значений для круговых индикаторов
                 document.querySelectorAll('.full-donut').forEach(donut => {
@@ -878,16 +1089,21 @@ const datalabelsPlugin = {
 
                 // Обновление значения для показателя суммы
                 document.querySelector('.value').textContent =
-                    Math.floor(Math.random() * 3000 + 1500) + ' руб.';
+                    (Math.floor(Math.random() * 3000) + 1500) + ' руб.';
             }
-
-            // Инициализация графиков после загрузки DOM
-            initCharts();
 
             // Привязка функции обновления данных к изменению группировки
             document.querySelectorAll('input[name="grouping"]').forEach(radio => {
                 radio.addEventListener('change', function() {
-                    updateCharts();
+                    // При изменении группировки сбрасываем выбор дат
+                    if (startDateInput.value && !startDateInput.disabled) {
+                        // Проверяем, подходит ли новая группировка
+                        updateLabelsBasedOnDate(startDateInput.value, 'start');
+                    } else if (endDateInput.value && !endDateInput.disabled) {
+                        updateLabelsBasedOnDate(endDateInput.value, 'end');
+                    } else {
+                        updateCharts();
+                    }
                 });
             });
 
@@ -899,13 +1115,13 @@ const datalabelsPlugin = {
                 window.print();
             });
 
-            // Установка дат с учетом того, что сегодня 14.05.2025
-            const today = new Date('2025-05-14');
-            const oneMonthAgo = new Date('2025-05-14');
-            oneMonthAgo.setMonth(today.getMonth() - 1);
-
-            document.getElementById('start-date').valueAsDate = oneMonthAgo;
-            document.getElementById('end-date').valueAsDate = today;
+            // Установка начальных значений для полей выбора даты и времени
+            const defaultDate = new Date();
+            defaultDate.setMinutes(defaultDate.getMinutes() - defaultDate.getMinutes() % 5); // Округляем до ближайших 5 минут
+            const defaultDateTime = defaultDate.toISOString().slice(0, 16); // Формат YYYY-MM-DDTHH:MM
+            
+            // Инициализация графиков после загрузки DOM
+            initCharts();
         });
     </script>
 </body>
