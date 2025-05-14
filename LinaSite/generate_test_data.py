@@ -111,7 +111,7 @@ def generate_test_data():
             last_pressure=f"{random.randint(100, 140)}/{random.randint(60, 90)}",
             is_regular=random.choice([True, False]),
             donation_count=random.randint(0, 20),
-            document_number=f"Паспорт {random.randint(1000, 9999)} {random.randint(100000, 999999)}",
+            document_number=f"Паспорт {random.randint(4000, 5000)} {random.randint(100000, 999999)}",
             registration_address=f"г. Москва, ул. {random.choice(['Ленина', 'Пушкина', 'Гагарина', 'Мира', 'Советская'])}, д. {random.randint(1, 100)}, кв. {random.randint(1, 100)}",
             fact_address=f"г. Москва, ул. {random.choice(['Ленина', 'Пушкина', 'Гагарина', 'Мира', 'Советская'])}, д. {random.randint(1, 100)}, кв. {random.randint(1, 100)}",
             height=random.randint(150, 200)

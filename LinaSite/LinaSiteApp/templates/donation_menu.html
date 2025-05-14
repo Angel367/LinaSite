@@ -222,10 +222,10 @@
 
     <script>
         document.getElementById('apply-button').addEventListener('click', function() {
-            if (document.getElementById('donation-register').checked) {
-                window.location.href = '/app/donation/create/';
-            } else if (document.getElementById('donor-search').checked) {
+            if (document.getElementById('donor-search').checked) {
                 window.location.href = '/app/donations/';
+            } else if (document.getElementById('donation-register').checked) {
+                window.location.href = '/app/donation/create/';
             }
         });
 

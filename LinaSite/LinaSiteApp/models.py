@@ -320,7 +320,12 @@ def create_base_direction(sender, instance, created, **kwargs):
         content_type = ContentType.objects.get_for_model(instance)
 
         # Calculate expiry date (30 days from creation by default)
-        expiry_date = instance.direction_date + datetime.timedelta(days=30)
+        if type(instance.direction_date) is str:
+            # Convert string to date object
+            instance.direction_date = datetime.datetime.strptime(instance.direction_date, "%Y-%m-%d").date()
+        else:
+            f = instance.direction_date
+        expiry_date = f + datetime.timedelta(days=30)
 
         DirectionBase.objects.create(
             donor=instance.donor,

@@ -1562,11 +1562,15 @@ from .models import Donor
 def donor_view(request, donor_id):
     """View a donor's information in read-only mode"""
     donor = get_object_or_404(Donor, id=donor_id)
-
+    try:
+        current_user_role = request.session['role']
+        is_can_edit = (current_user_role == "registrator")
+    except KeyError:
+        is_can_edit = False
     context = {
         'donor': donor,
         'read_only': True,
-        'can_edit': True,  # Allow editing option
+        'can_edit': is_can_edit,  # Allow editing option
     }
 
     return render(request, 'donor_personal_data.html', context)

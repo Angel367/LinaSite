@@ -572,7 +572,6 @@
             startDateInput.addEventListener('change', function() {
                 if (this.value) {
                     endDateInput.disabled = true;
-                    updateLabelsBasedOnDate(this.value, 'start');
                 } else {
                     endDateInput.disabled = false;
                 }
@@ -581,7 +580,6 @@
             endDateInput.addEventListener('change', function() {
                 if (this.value) {
                     startDateInput.disabled = true;
-                    updateLabelsBasedOnDate(this.value, 'end');
                 } else {
                     startDateInput.disabled = false;
                 }
@@ -599,9 +597,6 @@
                     // Показываем соответствующий контент
                     const tabId = tab.getAttribute('data-tab');
                     document.getElementById(`${tabId}-tab`).classList.add('active');
-
-                    // Перерисовываем графики для корректного отображения размеров
-                    updateCharts();
                 });
             });
 
@@ -723,20 +718,20 @@
                     }
                 }
                 
-                // Обновляем метки на всех графиках
-                Object.values(charts).forEach(chart => {
-                    if (chart.config.type === 'bar' || chart.config.type === 'line') {
-                        chart.data.labels = labels;
-                        chart.update();
-                    }
-                });
-                
-                currentLabels = labels;
-                return true;
+                return { labels: labels };
             }
 
+            // Периоды для различных типов группировки (для начальной инициализации)
+            const periodLabels = {
+                hours: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+                days: ['07.05', '08.05', '09.05', '10.05', '11.05', '12.05', '13.05', '14.05'],
+                weeks: ['26-01 апр', '02-08 апр', '09-15 апр', '16-22 апр', '23-29 апр', '30-06 мая', '07-13 мая', '14-20 мая'],
+                months: ['Окт 24', 'Нояб 24', 'Дек 24', 'Янв 25', 'Фев 25', 'Мар 25', 'Апр 25', 'Май 25'],
+                quarters: ['Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025']
+            };
+
             // Текущие метки периодов (по умолчанию месяцы)
-            let currentLabels = [];
+            let currentLabels = periodLabels.months;
             let currentGroupType = 'months';
 
             // Объект для хранения всех графиков
@@ -872,20 +867,8 @@
                 }
             };
 
-            // Периоды для различных типов группировки
-            const periodLabels = {
-                hours: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
-                days: ['07.05', '08.05', '09.05', '10.05', '11.05', '12.05', '13.05', '14.05'],
-                weeks: ['26-01 апр', '02-08 апр', '09-15 апр', '16-22 апр', '23-29 апр', '30-06 мая', '07-13 мая', '14-20 мая'],
-                months: ['Окт 24', 'Нояб 24', 'Дек 24', 'Янв 25', 'Фев 25', 'Мар 25', 'Апр 25', 'Май 25'],
-                quarters: ['Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025']
-            };
-
             // Инициализация всех графиков
             function initCharts() {
-                // Установка начальных меток
-                currentLabels = periodLabels[currentGroupType];
-                
                 // Общее количество доноров
                 charts.totalDonors = new Chart(
                     document.getElementById('total-donors-chart').getContext('2d'),
@@ -1027,43 +1010,51 @@
                 currentGroupType = document.querySelector('input[name="grouping"]:checked').value;
                 
                 // Если одна из дат выбрана, используем ее для генерации меток
-                let updated = false;
+                let updatedLabels = null;
                 
                 if (startDateInput.value && !startDateInput.disabled) {
-                    updated = updateLabelsBasedOnDate(startDateInput.value, 'start');
+                    const result = updateLabelsBasedOnDate(startDateInput.value, 'start');
+                    if (result) {
+                        updatedLabels = result.labels;
+                    }
                 } else if (endDateInput.value && !endDateInput.disabled) {
-                    updated = updateLabelsBasedOnDate(endDateInput.value, 'end');
+                    const result = updateLabelsBasedOnDate(endDateInput.value, 'end');
+                    if (result) {
+                        updatedLabels = result.labels;
+                    }
                 }
                 
-                // Если не было обновления через дату или оно не удалось, используем стандартные метки
-                if (!updated) {
-                    currentLabels = periodLabels[currentGroupType];
-                    
-                    // Обновляем столбчатые и линейные графики
-                    Object.entries(charts).forEach(([key, chart]) => {
-                        if (chart.config.type === 'bar' || chart.config.type === 'line') {
-                            // Обновляем метки
-                            chart.data.labels = currentLabels;
-
-                            // Обновляем данные с учетом типа группировки
-                            let data = getRandomData(currentGroupType);
-
-                            if (chart.config.type === 'line') {
-                                // Для линейного графика делим на 100, чтобы получить значения в миллионах
-                                data = data.map(val => val / 100);
-                            }
-
-                            chart.data.datasets[0].data = data;
-
-                            // Обновляем толщину столбцов в зависимости от количества (для столбчатых графиков)
-                            if (chart.config.type === 'bar') {
-                                chart.data.datasets[0].barThickness = 135;
-                            }
-
-                            chart.update();
-                        }
-                    });
+                // Если обновление меток не удалось или даты не выбраны, используем стандартные метки
+                if (!updatedLabels) {
+                    updatedLabels = periodLabels[currentGroupType];
                 }
+                
+                currentLabels = updatedLabels;
+                
+                // Обновляем столбчатые и линейные графики
+                Object.entries(charts).forEach(([key, chart]) => {
+                    if (chart.config.type === 'bar' || chart.config.type === 'line') {
+                        // Обновляем метки
+                        chart.data.labels = currentLabels;
+
+                        // Обновляем данные с учетом типа группировки
+                        let data = getRandomData(currentGroupType);
+
+                        if (chart.config.type === 'line') {
+                            // Для линейного графика делим на 100, чтобы получить значения в миллионах
+                            data = data.map(val => val / 100);
+                        }
+
+                        chart.data.datasets[0].data = data;
+
+                        // Обновляем толщину столбцов в зависимости от количества (для столбчатых графиков)
+                        if (chart.config.type === 'bar') {
+                            chart.data.datasets[0].barThickness = 135;
+                        }
+
+                        chart.update();
+                    }
+                });
 
                 // Обновляем круговой график типов донаций (случайными долями)
                 if (charts.donationTypes) {
@@ -1091,21 +1082,9 @@
                 document.querySelector('.value').textContent =
                     (Math.floor(Math.random() * 3000) + 1500) + ' руб.';
             }
-
-            // Привязка функции обновления данных к изменению группировки
-            document.querySelectorAll('input[name="grouping"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // При изменении группировки сбрасываем выбор дат
-                    if (startDateInput.value && !startDateInput.disabled) {
-                        // Проверяем, подходит ли новая группировка
-                        updateLabelsBasedOnDate(startDateInput.value, 'start');
-                    } else if (endDateInput.value && !endDateInput.disabled) {
-                        updateLabelsBasedOnDate(endDateInput.value, 'end');
-                    } else {
-                        updateCharts();
-                    }
-                });
-            });
+            
+            // Инициализация графиков после загрузки DOM
+            initCharts();
 
             // Привязка функции обновления данных к кнопке "Сформировать"
             document.getElementById('generate-report').addEventListener('click', updateCharts);
@@ -1120,8 +1099,11 @@
             defaultDate.setMinutes(defaultDate.getMinutes() - defaultDate.getMinutes() % 5); // Округляем до ближайших 5 минут
             const defaultDateTime = defaultDate.toISOString().slice(0, 16); // Формат YYYY-MM-DDTHH:MM
             
-            // Инициализация графиков после загрузки DOM
-            initCharts();
+            const oneMonthAgo = new Date(defaultDate);
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            const oneMonthAgoDateTime = oneMonthAgo.toISOString().slice(0, 16);
+            
+            startDateInput.value = oneMonthAgoDateTime;
         });
     </script>
 </body>
