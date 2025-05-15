@@ -1,4 +1,6 @@
 # models.py
+import random
+
 from django.db import models
 from django.utils import timezone
 import datetime
@@ -117,15 +119,10 @@ from django.utils import timezone
 
 
 class DonorCard(models.Model):
-    CONTRAINDICATION_CHOICES = [
-        ('yes', 'Да'),
-        ('no', 'Нет'),
-    ]
-
     donor = models.ForeignKey('Donor', on_delete=models.CASCADE, related_name='donor_cards', verbose_name="Донор")
     birth_date = models.DateField(verbose_name="Дата рождения")
-    has_contraindications = models.CharField(max_length=3, choices=CONTRAINDICATION_CHOICES,
-                                             verbose_name="Имеются ли в анамнезе заболевания из перечня противопоказаний?")
+    # Заменяем has_contraindications на contraindications
+    contraindications = models.JSONField(default=list, verbose_name="Выявленные противопоказания")
     height = models.IntegerField(verbose_name="Рост (см)")
     weight = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Вес (кг)")
     blood_group = models.CharField(max_length=3, verbose_name="Группа крови")
@@ -409,7 +406,7 @@ def create_base_direction(sender, instance, created, **kwargs):
         content_type = ContentType.objects.get_for_model(instance)
 
         # Calculate expiry date (7 days from planned donation date by default)
-        expiry_date = instance.planned_donation_date + datetime.timedelta(days=7)
+        expiry_date = instance.created_at + datetime.timedelta(random.randint(3, 14))
 
         DirectionBase.objects.create(
             donor=instance.donor,
@@ -485,7 +482,7 @@ def create_base_direction(sender, instance, created, **kwargs):
         content_type = ContentType.objects.get_for_model(instance)
 
         # Calculate expiry date (14 days from planned donation date by default)
-        expiry_date = instance.planned_donation_date + datetime.timedelta(days=14)
+        expiry_date = instance.created_at + datetime.timedelta(random.randint(3, 14))
 
         DirectionBase.objects.create(
             donor=instance.donor,
@@ -534,6 +531,13 @@ class ExternalDirection(models.Model):
 
     def __str__(self):
         return f"Внешнее направление для {self.donor} от {self.issue_date.strftime('%d.%m.%Y')}"
+
+    def get_research_type_display(self):
+        """Returns the display name for the research type"""
+        for code, name in self.RESEARCH_TYPE_CHOICES:
+            if code == self.research_type:
+                return name
+        return "Другое"
 
     class Meta:
         verbose_name = "Внешнее направление"

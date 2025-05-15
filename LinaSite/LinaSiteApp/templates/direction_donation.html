@@ -236,7 +236,7 @@
         .read-only-hidden {
             display: none !important;
         }
-                #user-info {
+        #user-info {
             position: fixed;
             top: 10px;
             right: 15px;
@@ -285,67 +285,73 @@
 
         {% if read_only %}
         <div class="read-only-notice">
-            <p>Просмотр направления. Все поля доступны только для чтения.</p>
+            <p>Просмотр направления.</p>
         </div>
         {% endif %}
 
-        <form id="direction-form" method="post" action="{% if not read_only %}{% url 'donation_direction_create' %}{% endif %}">
+        {% if edit_mode %}
+        <div class="read-only-notice">
+            <p>Режим редактирования направления.</p>
+        </div>
+        {% endif %}
+
+        <form id="direction-form" method="post" action="{% if edit_mode %}{% url 'donation_direction_update' direction.id %}{% elif not read_only %}{% url 'donation_direction_create' %}{% endif %}">
             {% csrf_token %}
             <div class="content-area">
                 <div class="left-section">
-<div class="form-group">
-    <label class="form-label">Дата донации*</label>
-    <div class="custom-select">
-        <select id="direction-date" name="direction_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
-            <option value="">Выберите дату донации</option>
-            {% if read_only and direction.direction_date %}
-                <option value="{{ direction.direction_date|date:'Y-m-d' }}" selected>{{ direction.direction_date|date:'d.m.Y' }}</option>
-            {% else %}
-                {% for date in available_dates %}
-                    <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.direction_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
-                {% endfor %}
-            {% endif %}
-        </select>
-    </div>
-</div>
+                    <div class="form-group">
+                        <label class="form-label">Дата донации*</label>
+                        <div class="custom-select">
+                            <select id="direction-date" name="direction_date" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
+                                <option value="">Выберите дату донации</option>
+                                {% if read_only and not edit_mode and direction.direction_date %}
+                                    <option value="{{ direction.direction_date|date:'Y-m-d' }}" selected>{{ direction.direction_date|date:'d.m.Y' }}</option>
+                                {% else %}
+                                    {% for date in available_dates %}
+                                        <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.direction_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
 
-<div class="form-group">
-    <label class="form-label">Донор*</label>
-    <div class="custom-select">
-        <select id="donor-select" name="donor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
-            <option value="">Выберите донора</option>
-            {% if read_only and direction.donor %}
-                <option value="{{ direction.donor.id }}" selected>{{ direction.donor.get_full_name }}</option>
-            {% else %}
-                {% for donor in donors %}
-                    <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
-                {% endfor %}
-            {% endif %}
-        </select>
-    </div>
-</div>
+                    <div class="form-group">
+                        <label class="form-label">Донор*</label>
+                        <div class="custom-select">
+                            <select id="donor-select" name="donor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
+                                <option value="">Выберите донора</option>
+                                {% if read_only and not edit_mode and direction.donor %}
+                                    <option value="{{ direction.donor.id }}" selected>{{ direction.donor.get_full_name }}</option>
+                                {% else %}
+                                    {% for donor in donors %}
+                                        <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="form-group">
                         <label class="form-label">Номер документа, удостоверяющего личность*</label>
-                        <input type="text" id="document-id" name="document_number" class="text-input {% if read_only %}read-only-input{% endif %}" required {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.document_number }}{% endif %}">
+                        <input type="text" id="document-id" name="document_number" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.document_number }}{% endif %}">
                     </div>
 
                     <div class="form-group donation-type-container">
                         <label class="donation-type-label">Выберите тип донации</label>
                         <div class="donation-types">
-                            <div class="donation-type {% if direction and direction.donation_type == 'whole_blood' %}selected{% endif %}" data-type="whole_blood" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'whole_blood' %}selected{% endif %}" data-type="whole_blood" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Цельная кровь
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'plasma' %}selected{% endif %}" data-type="plasma" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'plasma' %}selected{% endif %}" data-type="plasma" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Плазма
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'platelets' %}selected{% endif %}" data-type="platelets" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'platelets' %}selected{% endif %}" data-type="platelets" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Тромбоциты
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'erythrocytes' %}selected{% endif %}" data-type="erythrocytes" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'erythrocytes' %}selected{% endif %}" data-type="erythrocytes" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Эритроциты
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'granulocytes' %}selected{% endif %}" data-type="granulocytes" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'granulocytes' %}selected{% endif %}" data-type="granulocytes" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Гранулоциты
                             </div>
                         </div>
@@ -357,7 +363,7 @@
                     <div class="form-group">
                         <label class="form-label">Группа крови*</label>
                         <div class="custom-select">
-                            <select id="blood-group" name="blood_group" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="blood-group" name="blood_group" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Группа крови</option>
                                 <option value="O-" {% if direction and direction.blood_group == 'O-' %}selected{% endif %}>O-</option>
                                 <option value="O+" {% if direction and direction.blood_group == 'O+' %}selected{% endif %}>O+</option>
@@ -374,7 +380,7 @@
                     <div class="form-group">
                         <label class="form-label">Rh-фактор*</label>
                         <div class="custom-select">
-                            <select id="rh-factor" name="rh_factor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="rh-factor" name="rh_factor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Rh-фактор</option>
                                 <option value="+" {% if direction and direction.rh_factor == '+' %}selected{% endif %}>Положительный (+)</option>
                                 <option value="-" {% if direction and direction.rh_factor == '-' %}selected{% endif %}>Отрицательный (-)</option>
@@ -384,18 +390,18 @@
 
                     <div class="form-group">
                         <label class="form-label">Номер донации*</label>
-                        <input type="text" id="donation-number" name="donation_number" class="text-input {% if read_only %}read-only-input{% endif %}" required {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.donation_number }}{% endif %}">
+                        <input type="text" id="donation-number" name="donation_number" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.donation_number }}{% endif %}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Номер предыдущей донации</label>
-                        <input type="text" id="previous-donation-number" name="previous_donation_number" class="text-input {% if read_only %}read-only-input{% endif %}" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.previous_donation_number }}{% endif %}">
+                        <input type="text" id="previous-donation-number" name="previous_donation_number" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.previous_donation_number }}{% endif %}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Дата предыдущей донации</label>
                         <div class="custom-select">
-                            <select id="previous-donation-date" name="previous_donation_date" {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="previous-donation-date" name="previous_donation_date" {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите дату предыдущей донации</option>
                                 {% if direction and direction.previous_donation_date %}
                                 <option value="{{ direction.previous_donation_date|date:'Y-m-d' }}" selected>{{ direction.previous_donation_date|date:'d.m.Y' }}</option>
@@ -408,15 +414,26 @@
                 </div>
 
                 <div class="right-section">
-                    <!-- Regular buttons (hidden in read-only mode) -->
-                    <div class="{% if read_only %}read-only-hidden{% endif %}">
+                    <!-- Regular buttons (shown only when creating) -->
+                    <div class="{% if read_only or edit_mode %}read-only-hidden{% endif %}">
                         <button type="submit" class="button button-primary">Применить</button>
                         <button type="reset" id="reset-button" class="button button-secondary">Сбросить</button>
                     </div>
 
-                    <!-- Back button (shown only in read-only mode) -->
-                    {% if read_only %}
-                    <a href="{% url 'direction_search' %}" class="button button-primary">Вернуться к поиску</a>
+                    <!-- Edit mode buttons (shown only in edit mode) -->
+                    <div class="{% if not edit_mode %}read-only-hidden{% endif %}">
+                        <button type="submit" class="button button-primary">Сохранить изменения</button>
+                        <a href="{% if direction %}{% url 'donation_direction_view' direction.id %}{% else %}{% url 'direction_search' %}{% endif %}" class="button button-secondary">Отменить</a>
+                    </div>
+
+                    <!-- View mode buttons (shown only in read-only mode) -->
+                    {% if read_only and not edit_mode %}
+                    <div>
+                        {% if can_edit %}
+                        <a href="{% url 'donation_direction_edit' direction.id %}" class="button button-primary">Редактировать</a>
+                        {% endif %}
+                        <a href="{% url 'direction_search' %}" class="button button-secondary">Вернуться к поиску</a>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -425,11 +442,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Check if we're in read-only mode
-        const isReadOnly = {% if read_only %}true{% else %}false{% endif %};
+        // Check if we're in read-only mode or edit mode
+        const isReadOnly = {% if read_only and not edit_mode %}true{% else %}false{% endif %};
+        const isEditMode = {% if edit_mode %}true{% else %}false{% endif %};
 
-        // If we're in read-only mode, disable the form functionality
-        if (isReadOnly) {
+        // If we're in read-only mode and not in edit mode, disable the form functionality
+        if (isReadOnly && !isEditMode) {
             // No need to initialize interactive elements in read-only mode
             return;
         }
@@ -457,52 +475,54 @@
             });
         });
 
-        // Автозаполнение при выборе донора
-        donorSelect.addEventListener('change', function() {
-            const donorId = this.value;
-            if (!donorId) {
-                clearDonorFields();
-                return;
-            }
+        // Автозаполнение при выборе донора (только если не в режиме редактирования)
+        if (!isEditMode) {
+            donorSelect.addEventListener('change', function() {
+                const donorId = this.value;
+                if (!donorId) {
+                    clearDonorFields();
+                    return;
+                }
 
-            // Запрашиваем информацию о доноре через API
-            fetch(`/app/api/donor/${donorId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Заполняем поля данными донора
-                        documentIdField.value = data.document_number || '';
-                        bloodGroupField.value = data.blood_group || '';
-                        rhFactorField.value = data.rh_factor || '';
+                // Запрашиваем информацию о доноре через API
+                fetch(`/app/api/donor/${donorId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Заполняем поля данными донора
+                            documentIdField.value = data.document_number || '';
+                            bloodGroupField.value = data.blood_group || '';
+                            rhFactorField.value = data.rh_factor || '';
 
-                        // Получаем информацию о последней донации донора
-                        return fetch(`/app/api/donor/${donorId}/last_donation/`);
-                    } else {
-                        alert('Ошибка при получении данных донора');
-                        return Promise.reject();
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.last_donation) {
-                        // Заполняем поля данными последней донации
-                        previousDonationNumberField.value = data.last_donation.donation_number || '';
-
-                        // Добавляем дату последней донации в выпадающий список
-                        if (data.last_donation.donation_date) {
-                            const option = document.createElement('option');
-                            option.value = data.last_donation.donation_date;
-                            option.textContent = formatDate(data.last_donation.donation_date);
-                            previousDonationDateField.innerHTML = ''; // Очищаем список
-                            previousDonationDateField.appendChild(option);
-                            previousDonationDateField.value = data.last_donation.donation_date;
+                            // Получаем информацию о последней донации донора
+                            return fetch(`/app/api/donor/${donorId}/last_donation/`);
+                        } else {
+                            alert('Ошибка при получении данных донора');
+                            return Promise.reject();
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                });
-        });
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.last_donation) {
+                            // Заполняем поля данными последней донации
+                            previousDonationNumberField.value = data.last_donation.donation_number || '';
+
+                            // Добавляем дату последней донации в выпадающий список
+                            if (data.last_donation.donation_date) {
+                                const option = document.createElement('option');
+                                option.value = data.last_donation.donation_date;
+                                option.textContent = formatDate(data.last_donation.donation_date);
+                                previousDonationDateField.innerHTML = ''; // Очищаем список
+                                previousDonationDateField.appendChild(option);
+                                previousDonationDateField.value = data.last_donation.donation_date;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                    });
+            });
+        }
 
         // Функция очистки полей
         function clearDonorFields() {
@@ -522,10 +542,17 @@
         // Обработка сброса формы
         resetButton.addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('direction-form').reset();
-            clearDonorFields();
-            donationTypes.forEach(t => t.classList.remove('selected'));
-            donationTypeField.value = '';
+            
+            if (isEditMode) {
+                // В режиме редактирования возвращаем к исходным значениям
+                window.location.reload();
+            } else {
+                // В режиме создания полностью очищаем форму
+                document.getElementById('direction-form').reset();
+                clearDonorFields();
+                donationTypes.forEach(t => t.classList.remove('selected'));
+                donationTypeField.value = '';
+            }
         });
 
         // Обработка отправки формы

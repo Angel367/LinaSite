@@ -310,7 +310,7 @@
         .read-only-hidden {
             display: none !important;
         }
-                #user-info {
+        #user-info {
             position: fixed;
             top: 10px;
             right: 15px;
@@ -359,18 +359,24 @@
 
         {% if read_only %}
         <div class="read-only-notice">
-            <p>Просмотр направления. Все поля доступны только для чтения.</p>
+            <p>Просмотр направления.</p>
+        </div>
+        {% endif %}
+        
+        {% if edit_mode %}
+        <div class="read-only-notice">
+            <p>Режим редактирования направления.</p>
         </div>
         {% endif %}
 
-        <form id="examination-form" method="post" action="{% if not read_only %}{% url 'examination_direction_create' %}{% endif %}">
+        <form id="examination-form" method="post" action="{% if edit_mode %}{% url 'examination_direction_update' direction.id %}{% elif not read_only %}{% url 'examination_direction_create' %}{% endif %}">
             {% csrf_token %}
             <div class="content-area">
                 <div class="left-section">
                     <div class="form-group">
                         <label class="form-label">Дата предполагаемой донации*</label>
                         <div class="custom-select">
-                            <select id="planned-donation-date" name="planned_donation_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="planned-donation-date" name="planned_donation_date" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите дату</option>
                                 {% for date in available_dates %}
                                     <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.planned_donation_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
@@ -382,7 +388,7 @@
                     <div class="form-group">
                         <label class="form-label">Донор*</label>
                         <div class="custom-select">
-                            <select id="donor-select" name="donor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="donor-select" name="donor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите донора</option>
                                 {% for donor in donors %}
                                     <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
@@ -393,25 +399,25 @@
 
                     <div class="form-group">
                         <label class="form-label">Номер документа, удостоверяющего личность*</label>
-                        <input type="text" id="document-id" name="document_number" class="text-input {% if read_only %}read-only-input{% endif %}" required {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.document_number }}{% endif %}">
+                        <input type="text" id="document-id" name="document_number" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.document_number }}{% endif %}">
                     </div>
 
                     <div class="form-group donation-type-container">
                         <label class="donation-type-label">Выберите тип донации</label>
                         <div class="donation-types">
-                            <div class="donation-type {% if direction and direction.donation_type == 'whole_blood' %}selected{% endif %}" data-type="whole_blood" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'whole_blood' %}selected{% endif %}" data-type="whole_blood" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Цельная кровь
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'plasma' %}selected{% endif %}" data-type="plasma" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'plasma' %}selected{% endif %}" data-type="plasma" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Плазма
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'platelets' %}selected{% endif %}" data-type="platelets" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'platelets' %}selected{% endif %}" data-type="platelets" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Тромбоциты
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'erythrocytes' %}selected{% endif %}" data-type="erythrocytes" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'erythrocytes' %}selected{% endif %}" data-type="erythrocytes" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Эритроциты
                             </div>
-                            <div class="donation-type {% if direction and direction.donation_type == 'granulocytes' %}selected{% endif %}" data-type="granulocytes" {% if read_only %}style="pointer-events: none;"{% endif %}>
+                            <div class="donation-type {% if direction and direction.donation_type == 'granulocytes' %}selected{% endif %}" data-type="granulocytes" {% if read_only and not edit_mode %}style="pointer-events: none;"{% endif %}>
                                 Гранулоциты
                             </div>
                         </div>
@@ -421,7 +427,7 @@
                     <div class="form-group">
                         <label class="form-label">Группа крови*</label>
                         <div class="custom-select">
-                            <select id="blood-group" name="blood_group" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="blood-group" name="blood_group" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Группа крови</option>
                                 <option value="O-" {% if direction and direction.blood_group == 'O-' %}selected{% endif %}>O-</option>
                                 <option value="O+" {% if direction and direction.blood_group == 'O+' %}selected{% endif %}>O+</option>
@@ -438,7 +444,7 @@
                     <div class="form-group">
                         <label class="form-label">Rh-фактор*</label>
                         <div class="custom-select">
-                            <select id="rh-factor" name="rh_factor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="rh-factor" name="rh_factor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Rh-фактор</option>
                                 <option value="+" {% if direction and direction.rh_factor == '+' %}selected{% endif %}>Положительный (+)</option>
                                 <option value="-" {% if direction and direction.rh_factor == '-' %}selected{% endif %}>Отрицательный (-)</option>
@@ -452,15 +458,15 @@
                         <div class="checkbox-title">Есть ли жалобы?*</div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="complaints-yes" name="has_complaints" value="yes" {% if direction and direction.has_complaints == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="complaints-yes" name="has_complaints" value="yes" {% if direction and direction.has_complaints == 'yes' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Да
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="complaints-no" name="has_complaints" value="no" {% if direction and direction.has_complaints == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="complaints-no" name="has_complaints" value="no" {% if direction and direction.has_complaints == 'no' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Нет
                                 </label>
@@ -472,15 +478,15 @@
                         <div class="checkbox-title">Имеются ли в анамнезе заболевания из перечня противопоказаний?*</div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="contraindications-yes" name="has_contraindications" value="yes" {% if direction and direction.has_contraindications == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="contraindications-yes" name="has_contraindications" value="yes" {% if direction and direction.has_contraindications == 'yes' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Да
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="contraindications-no" name="has_contraindications" value="no" {% if direction and direction.has_contraindications == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="contraindications-no" name="has_contraindications" value="no" {% if direction and direction.has_contraindications == 'no' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Нет
                                 </label>
@@ -492,15 +498,15 @@
                         <div class="checkbox-title">Склеры, видимые слизистые (полости рта, носа) нормально окрашены?*</div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="mucous-yes" name="normal_mucous" value="yes" {% if direction and direction.normal_mucous == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="mucous-yes" name="normal_mucous" value="yes" {% if direction and direction.normal_mucous == 'yes' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Да
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="mucous-no" name="normal_mucous" value="no" {% if direction and direction.normal_mucous == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="mucous-no" name="normal_mucous" value="no" {% if direction and direction.normal_mucous == 'no' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Нет
                                 </label>
@@ -512,15 +518,15 @@
                         <div class="checkbox-title">Кожа чистая, лимфоузлы не увеличены?*</div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="skin-yes" name="clean_skin" value="yes" {% if direction and direction.clean_skin == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="skin-yes" name="clean_skin" value="yes" {% if direction and direction.clean_skin == 'yes' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Да
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="skin-no" name="clean_skin" value="no" {% if direction and direction.clean_skin == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="skin-no" name="clean_skin" value="no" {% if direction and direction.clean_skin == 'no' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Нет
                                 </label>
@@ -532,15 +538,15 @@
                         <div class="checkbox-title">Выявлены ли патологии при аускультации сердца и легких?*</div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="cardiac-yes" name="normal_cardiac" value="yes" {% if direction and direction.normal_cardiac == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="cardiac-yes" name="normal_cardiac" value="yes" {% if direction and direction.normal_cardiac == 'yes' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Да
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="cardiac-no" name="normal_cardiac" value="no" {% if direction and direction.normal_cardiac == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="cardiac-no" name="normal_cardiac" value="no" {% if direction and direction.normal_cardiac == 'no' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Нет
                                 </label>
@@ -552,15 +558,15 @@
                         <div class="checkbox-title">Есть ли отклонения в органах брюшной полости?*</div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="abdomen-yes" name="normal_abdomen" value="yes" {% if direction and direction.normal_abdomen == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="abdomen-yes" name="normal_abdomen" value="yes" {% if direction and direction.normal_abdomen == 'yes' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Да
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="abdomen-no" name="normal_abdomen" value="no" {% if direction and direction.normal_abdomen == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="abdomen-no" name="normal_abdomen" value="no" {% if direction and direction.normal_abdomen == 'no' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Нет
                                 </label>
@@ -572,15 +578,15 @@
                         <div class="checkbox-title">Были ли операции/вакцинации в течение последних 2 месяцев?*</div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="operations-yes" name="recent_operations" value="yes" {% if direction and direction.recent_operations == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="operations-yes" name="recent_operations" value="yes" {% if direction and direction.recent_operations == 'yes' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Да
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="checkbox" id="operations-no" name="recent_operations" value="no" {% if direction and direction.recent_operations == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %}>
+                                <label class="custom-checkbox" {% if read_only and not edit_mode %}style="cursor: not-allowed;"{% endif %}>
+                                    <input type="checkbox" id="operations-no" name="recent_operations" value="no" {% if direction and direction.recent_operations == 'no' %}checked{% endif %} {% if read_only and not edit_mode %}disabled{% endif %}>
                                     <span class="checkmark"></span>
                                     Нет
                                 </label>
@@ -592,41 +598,51 @@
                 <div class="right-section">
                     <div class="form-group">
                         <label class="form-label">Значение артериального давления*</label>
-                        <input type="text" id="blood-pressure" name="blood_pressure" class="text-input {% if read_only %}read-only-input{% endif %}" required {% if read_only %}readonly{% endif %} placeholder="120/80" value="{% if direction %}{{ direction.blood_pressure }}{% endif %}">
+                        <input type="text" id="blood-pressure" name="blood_pressure" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required {% if read_only and not edit_mode %}readonly{% endif %} placeholder="120/80" value="{% if direction %}{{ direction.blood_pressure }}{% endif %}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Пульс*</label>
-                        <input type="number" id="pulse" name="pulse" class="text-input {% if read_only %}read-only-input{% endif %}" required min="40" max="200" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.pulse }}{% endif %}">
+                        <input type="number" id="pulse" name="pulse" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required min="40" max="200" {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.pulse }}{% endif %}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Температура тела*</label>
-                        <input type="number" id="temperature" name="temperature" class="text-input {% if read_only %}read-only-input{% endif %}" required step="0.1" min="35.0" max="42.0" placeholder="36.6" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.temperature }}{% endif %}">
+                        <input type="number" id="temperature" name="temperature" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required step="0.1" min="35.0" max="42.0" placeholder="36.6" {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.temperature }}{% endif %}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Рост (см)*</label>
-                        <input type="number" id="height" name="height" class="text-input {% if read_only %}read-only-input{% endif %}" required min="140" max="240" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.height }}{% endif %}">
+                        <input type="number" id="height" name="height" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required min="140" max="240" {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.height }}{% endif %}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Вес (кг)*</label>
-                        <input type="number" id="weight" name="weight" class="text-input {% if read_only %}read-only-input{% endif %}" required step="0.1" min="45" max="200" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.weight }}{% endif %}">
+                        <input type="number" id="weight" name="weight" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" required step="0.1" min="45" max="200" {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.weight }}{% endif %}">
                     </div>
 
                     <p class="required-note">*поле обязательно для заполнения</p>
 
-                    <!-- Regular buttons (hidden in read-only mode) -->
-                    <div class="button-container {% if read_only %}read-only-hidden{% endif %}">
+                    <!-- Regular buttons (показываются только в режиме создания) -->
+                    <div class="button-container {% if read_only or edit_mode %}read-only-hidden{% endif %}">
                         <button type="submit" id="approve-button" name="is_approved" value="true" class="button button-primary">Допустить</button>
                         <button type="submit" id="reject-button" name="is_approved" value="false" class="button button-secondary">Отклонить</button>
                     </div>
 
-                    <!-- Back button (shown only in read-only mode) -->
-                    {% if read_only %}
+                    <!-- Edit mode buttons (показываются только в режиме редактирования) -->
+                    <div class="button-container {% if not edit_mode %}read-only-hidden{% endif %}">
+                        <button type="submit" id="approve-edit-button" name="is_approved" value="true" class="button button-primary">Сохранить и допустить</button>
+                        <button type="submit" id="reject-edit-button" name="is_approved" value="false" class="button button-secondary">Сохранить и отклонить</button>
+                        <a href="{% if direction %}{% url 'examination_direction_view' direction.id %}{% else %}{% url 'direction_search' %}{% endif %}" class="button button-secondary">Отменить</a>
+                    </div>
+
+                    <!-- View mode buttons (показываются только в режиме просмотра) -->
+                    {% if read_only and not edit_mode %}
                     <div class="button-container">
-                        <a href="{% url 'direction_search' %}" class="button button-primary">Вернуться к поиску</a>
+                        {% if can_edit %}
+                        <a href="{% url 'examination_direction_edit' direction.id %}" class="button button-primary">Редактировать</a>
+                        {% endif %}
+                        <a href="{% url 'direction_search' %}" class="button button-secondary">Вернуться к поиску</a>
 
                         <!-- Status display -->
                         <div style="text-align: center; margin-top: 10px; font-weight: bold;">
@@ -645,11 +661,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Check if we're in read-only mode
-        const isReadOnly = {% if read_only %}true{% else %}false{% endif %};
+        // Check if we're in read-only mode or edit mode
+        const isReadOnly = {% if read_only and not edit_mode %}true{% else %}false{% endif %};
+        const isEditMode = {% if edit_mode %}true{% else %}false{% endif %};
 
-        // If we're in read-only mode, disable the form functionality
-        if (isReadOnly) {
+        // If we're in read-only mode and not in edit mode, disable the form functionality
+        if (isReadOnly && !isEditMode) {
             // No need to initialize interactive elements in read-only mode
             return;
         }
@@ -705,52 +722,54 @@
             });
         });
 
-        // Автозаполнение при выборе донора
-        donorSelect.addEventListener('change', function() {
-            const donorId = this.value;
-            if (!donorId) {
-                clearDonorFields();
-                return;
-            }
+        // Автозаполнение при выборе донора (только в режиме создания, не в редактировании)
+        if (!isEditMode) {
+            donorSelect.addEventListener('change', function() {
+                const donorId = this.value;
+                if (!donorId) {
+                    clearDonorFields();
+                    return;
+                }
 
-            // Запрашиваем информацию о доноре через API
-            fetch(`/app/api/donor/${donorId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Заполняем поля данными донора
-                        documentIdField.value = data.document_number || '';
-                        bloodGroupField.value = data.blood_group || '';
-                        rhFactorField.value = data.rh_factor || '';
+                // Запрашиваем информацию о доноре через API
+                fetch(`/app/api/donor/${donorId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Заполняем поля данными донора
+                            documentIdField.value = data.document_number || '';
+                            bloodGroupField.value = data.blood_group || '';
+                            rhFactorField.value = data.rh_factor || '';
 
-                        // Заполняем последние известные показатели, если они есть
-                        if (data.last_weight) {
-                            weightField.value = data.last_weight;
-                        }
-                        if (data.last_pressure) {
-                            bloodPressureField.value = data.last_pressure;
-                        }
-                        if (data.last_height) {
-                            heightField.value = data.last_height;
-                        }
+                            // Заполняем последние известные показатели, если они есть
+                            if (data.last_weight) {
+                                weightField.value = data.last_weight;
+                            }
+                            if (data.last_pressure) {
+                                bloodPressureField.value = data.last_pressure;
+                            }
+                            if (data.last_height) {
+                                heightField.value = data.last_height;
+                            }
 
-                        // Получаем информацию о предпочитаемом типе донации
-                        if (data.preferred_donation_type) {
-                            // Выбираем соответствующий тип донации
-                            donationTypes.forEach(type => {
-                                if (type.getAttribute('data-type') === data.preferred_donation_type) {
-                                    type.click(); // Симулируем клик для выбора
-                                }
-                            });
+                            // Получаем информацию о предпочитаемом типе донации
+                            if (data.preferred_donation_type) {
+                                // Выбираем соответствующий тип донации
+                                donationTypes.forEach(type => {
+                                    if (type.getAttribute('data-type') === data.preferred_donation_type) {
+                                        type.click(); // Симулируем клик для выбора
+                                    }
+                                });
+                            }
+                        } else {
+                            alert('Ошибка при получении данных донора');
                         }
-                    } else {
-                        alert('Ошибка при получении данных донора');
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                });
-        });
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                    });
+            });
+        }
 
         // Функция очистки полей
         function clearDonorFields() {

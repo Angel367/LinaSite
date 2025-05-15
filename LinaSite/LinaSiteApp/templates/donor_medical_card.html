@@ -354,7 +354,7 @@
         .direction-item-icon {
             color: #E60012;
         }
-                .donor-status {
+        .donor-status {
             margin-top: 10px;
             display: flex;
             flex-direction: column;
@@ -371,7 +371,7 @@
             background-color: rgba(230, 0, 18, 0.1);
             color: #E60012;
         }
-                #user-info {
+        #user-info {
             position: fixed;
             top: 10px;
             right: 15px;
@@ -381,6 +381,11 @@
             font-weight: bold;
             text-align: center;
             pointer-events: none; /* чтобы не мешал кликам по элементам под ним */
+        }
+        .no-directions {
+            color: #666;
+            font-style: italic;
+            margin: 15px 0;
         }
     </style>
 </head>
@@ -429,7 +434,13 @@
                                 <span class="{{ is_regular_class }}">
                                     {{ is_regular_text }}
                                 </span>
-                            <div class="donation-label">{{ total_donations }} донации</div>
+                            <div class="donation-label">
+                                {% if total_donations > 0 %}
+                                    {{ total_donations }} донаци{% if total_donations == 1 %}я{% elif 2 <= total_donations <= 4 %}и{% else %}й{% endif %}
+                                {% else %}
+                                    Нет донаций
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
 
@@ -462,42 +473,40 @@
                             <span class="nav-item-icon">›</span>
                         </a>
                     </div>
-
-                    <a href="/app/donation/create/" class="button button-primary" style="margin-top: 20px;">Записать на донацию</a>
                 </div>
 
                 <div class="right-content">
-                    <!-- Первый прогресс-круг -->
-                    <div class="progress-section">
-                        <div class="circle-progress">
-                            <svg class="progress-circle">
-                                <circle class="progress-circle-bg" cx="75" cy="75" r="70"></circle>
-                                <circle class="progress-circle-progress" cx="75" cy="75" r="70" stroke-dashoffset="{{ first_progress_offset }}"></circle>
-                            </svg>
-                            <div class="progress-text">
-                                Осталось<br>из 60
-                            </div>
-                        </div>
-                        <div class="progress-note">
-                            Если донаций цельной крови/<br>клеточных компонентов меньше 25
-                        </div>
-                    </div>
+<!-- Первый прогресс-круг -->
+<div class="progress-section">
+    <div class="circle-progress">
+        <svg class="progress-circle">
+            <circle class="progress-circle-bg" cx="75" cy="75" r="70"></circle>
+            <circle class="progress-circle-progress" cx="75" cy="75" r="70" stroke-dashoffset="{{ first_progress_offset }}"></circle>
+        </svg>
+        <div class="progress-text">
+            Осталось<br>{{ first_remaining }} из {{ first_total }}
+        </div>
+    </div>
+    <div class="progress-note">
+        Если донаций цельной крови/<br>клеточных компонентов меньше 25
+    </div>
+</div>
 
-                    <!-- Второй прогресс-круг -->
-                    <div class="progress-section">
-                        <div class="circle-progress">
-                            <svg class="progress-circle">
-                                <circle class="progress-circle-bg" cx="75" cy="75" r="70"></circle>
-                                <circle class="progress-circle-progress" cx="75" cy="75" r="70" stroke-dashoffset="{{ second_progress_offset }}"></circle>
-                            </svg>
-                            <div class="progress-text">
-                                Осталось<br>из 40
-                            </div>
-                        </div>
-                        <div class="progress-note">
-                            Из них<br>минимум 25 донаций цельной<br>крови/клеточных компонентов
-                        </div>
-                    </div>
+<!-- Второй прогресс-круг -->
+<div class="progress-section">
+    <div class="circle-progress">
+        <svg class="progress-circle">
+            <circle class="progress-circle-bg" cx="75" cy="75" r="70"></circle>
+            <circle class="progress-circle-progress" cx="75" cy="75" r="70" stroke-dashoffset="{{ second_progress_offset }}"></circle>
+        </svg>
+        <div class="progress-text">
+            Осталось<br>{{ second_remaining }} из {{ second_total }}
+        </div>
+    </div>
+    <div class="progress-note">
+        Из них<br>минимум 25 донаций цельной<br>крови/клеточных компонентов
+    </div>
+</div>
                 </div>
             </div>
 
@@ -515,14 +524,12 @@
                             <div class="health-value">{{ donor.last_pressure|default:"115/61" }}</div>
                         </div>
 
-                        {% for direction in latest_directions %}
-                        <a href="{{ direction.get_view_url }}" class="direction-link">Выдано направление</a>
-                        {% endfor %}
-                        <!-- Если нет направлений, показываем демо-содержимое -->
-                        {% if not latest_directions %}
-                        <a href="#" class="direction-link">Выдано направление</a>
-                        <a href="#" class="direction-link">Выдано направление</a>
-                        <a href="#" class="direction-link">Выдано направление</a>
+                        {% if external_directions %}
+                            {% for ext_dir in external_directions %}
+                            <a href="{{ ext_dir.get_view_url }}" class="direction-link">{{ ext_dir.type_display }}</a>
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-directions">Нет внешних направлений</p>
                         {% endif %}
                     </div>
                 </div>
@@ -531,22 +538,15 @@
                     <div class="directions-section">
                         <h3>Выданные направления</h3>
                         <div>
-                            {% for direction in active_directions %}
-                            <a href="{{ direction.get_view_url }}" class="direction-item">
-                                <span>Направление</span>
-                                <span class="direction-item-icon">›</span>
-                            </a>
-                            {% endfor %}
-                            <!-- Если нет направлений, показываем демо-содержимое -->
-                            {% if not active_directions %}
-                            <a href="#" class="direction-item">
-                                <span>Направление</span>
-                                <span class="direction-item-icon">›</span>
-                            </a>
-                            <a href="#" class="direction-item">
-                                <span>Направление</span>
-                                <span class="direction-item-icon">›</span>
-                            </a>
+                            {% if internal_directions %}
+                                {% for int_dir in internal_directions %}
+                                <a href="{{ int_dir.get_view_url }}" class="direction-item">
+                                    <span>{{ int_dir.type_display }}</span>
+                                    <span class="direction-item-icon">›</span>
+                                </a>
+                                {% endfor %}
+                            {% else %}
+                                <p class="no-directions">Нет активных направлений</p>
                             {% endif %}
                         </div>
                     </div>

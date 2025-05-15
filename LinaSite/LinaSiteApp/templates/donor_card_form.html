@@ -296,7 +296,7 @@
         .read-only-hidden {
             display: none !important;
         }
-                #user-info {
+        #user-info {
             position: fixed;
             top: 10px;
             right: 15px;
@@ -306,6 +306,94 @@
             font-weight: bold;
             text-align: center;
             pointer-events: none; /* чтобы не мешал кликам по элементам под ним */
+        }
+        
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .close-modal:hover {
+            color: #000;
+        }
+        
+        .contraindication-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .contraindication-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .contraindication-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .contraindication-item input {
+            margin-right: 10px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Стили для блока с историей противопоказаний */
+        .contraindication-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .contraindication-date {
+            color: #666;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -345,7 +433,7 @@
 
         {% if read_only %}
         <div class="read-only-notice">
-            <p>Просмотр карточки донора. Все поля доступны только для чтения.</p>
+            <p>Просмотр карточки донора.</p>
         </div>
         {% endif %}
 
@@ -434,25 +522,58 @@
                         <input type="date" id="birth-date" name="birth_date" class="text-input {% if read_only %}read-only-input{% endif %}" required {% if read_only %}readonly{% endif %} value="{% if donor_card %}{{ donor_card.birth_date|date:'Y-m-d' }}{% endif %}">
                     </div>
 
-                    <div class="form-group checkbox-container">
-                        <div class="checkbox-title">Имеются ли в анамнезе заболевания из перечня противопоказаний?*</div>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="radio" name="has_contraindications" value="yes" {% if donor_card and donor_card.has_contraindications == 'yes' %}checked{% endif %} {% if read_only %}disabled{% endif %} required>
-                                    <span class="checkmark"></span>
-                                    Да
-                                </label>
-                            </div>
-                            <div class="checkbox-item">
-                                <label class="custom-checkbox" {% if read_only %}style="cursor: not-allowed;"{% endif %}>
-                                    <input type="radio" name="has_contraindications" value="no" {% if donor_card and donor_card.has_contraindications == 'no' %}checked{% endif %} {% if read_only %}disabled{% endif %} required>
-                                    <span class="checkmark"></span>
-                                    Нет
-                                </label>
-                            </div>
+                    {% if read_only %}
+                    <!-- В режиме просмотра показываем только блок с "Просмотреть" -->
+                    <div class="form-group">
+                        <label class="form-label">Ранее выявленные противопоказания из перечня:</label>
+                        <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                            <button type="button" id="open-previous-contraindications-modal" class="button button-secondary">
+                                Просмотреть
+                            </button>
+                            <span id="previous-contraindications-count">
+                                {% if donor_card and donor_card.contraindications %}
+                                    Выбрано: {{ donor_card.contraindications|length }}
+                                {% else %}
+                                    Противопоказаний не выявлено
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
+                    {% else %}
+                    <!-- В режиме редактирования показываем оба блока -->
+                    <div class="form-group">
+                        <label class="form-label">Выберите выявленные противопоказания из перечня:*</label>
+                        <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                            <button type="button" id="open-contraindications-modal" class="button button-secondary">
+                                Выбрать
+                            </button>
+                            <span id="selected-contraindications-count">
+                                {% if donor_card and donor_card.contraindications %}
+                                    Выбрано: {{ donor_card.contraindications|length }}
+                                {% else %}
+                                    Противопоказаний не выявлено
+                                {% endif %}
+                            </span>
+                        </div>
+                        <input type="hidden" id="selected-contraindications" name="contraindications" value="{% if donor_card %}{{ donor_card.contraindications|join:',' }}{% endif %}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ранее выявленные противопоказания из перечня:</label>
+                        <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                            <button type="button" id="open-previous-contraindications-modal" class="button button-secondary">
+                                Просмотреть
+                            </button>
+                            <span id="previous-contraindications-count">
+                                {% if donor_card and donor_card.contraindications %}
+                                    Выбрано: {{ donor_card.contraindications|length }}
+                                {% else %}
+                                    Противопоказаний не выявлено
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <div class="form-group">
                         <label class="form-label">Рост (см)*</label>
@@ -463,25 +584,18 @@
                         <label class="form-label">Вес (кг)*</label>
                         <input type="number" id="weight" name="weight" class="text-input {% if read_only %}read-only-input{% endif %}" required step="0.01" min="45" max="200" {% if read_only %}readonly{% endif %} value="{% if donor_card %}{{ donor_card.weight }}{% endif %}">
                     </div>
-<p class="required-note">*поле обязательно для заполнения</p>
+                    <p class="required-note">*поле обязательно для заполнения</p>
                     {% if donor_card %}
                     <a href="/" class="button button-secondary" >Просмотреть последнюю заполненную анкету</a>
-{#                    #TODO:#}
-{#                       <a href="{% url 'view_last_questionnaire' donor_card.donor.id %}" class="button button-link">Просмотреть последнюю заполненную анкету</a> #}
                     {% endif %}
                 </div>
-
             </div>
-
-
 
             <!-- Regular buttons (hidden in read-only mode) -->
             <div class="buttons-container {% if read_only %}read-only-hidden{% endif %}">
                 <button type="submit" class="button button-primary">Применить</button>
                 <button type="reset" id="reset-button" class="button button-secondary">Сбросить</button>
                 <a href="javascript:history.back()" class="button button-tertiary">Вернуться</a>
-
-
             </div>
 
             <!-- Back button (shown only in read-only mode) -->
@@ -497,14 +611,169 @@
         </form>
     </div>
 
+    <!-- Модальное окно для выбора противопоказаний -->
+    <div id="contraindications-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Выберите противопоказания</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="contraindication-list">
+                <div class="contraindication-item">
+                    <label>
+                        <input type="checkbox" value="сыпной_тиф" class="contraindication-checkbox"> Сыпной тиф
+                    </label>
+                </div>
+                <div class="contraindication-item">
+                    <label>
+                        <input type="checkbox" value="туляремия" class="contraindication-checkbox"> Туляремия
+                    </label>
+                </div>
+                <div class="contraindication-item">
+                    <label>
+                        <input type="checkbox" value="лепра" class="contraindication-checkbox"> Лепра (болезнь Гансена)
+                    </label>
+                </div>
+                <div class="contraindication-item">
+                    <label>
+                        <input type="checkbox" value="африканский_трипаносомоз" class="contraindication-checkbox"> Африканский трипаносомоз
+                    </label>
+                </div>
+                <div class="contraindication-item">
+                    <label>
+                        <input type="checkbox" value="болезнь_Чагаса" class="contraindication-checkbox"> Болезнь Чагаса
+                    </label>
+                </div>
+                <div class="contraindication-item">
+                    <label>
+                        <input type="checkbox" value="лейшманиоз" class="contraindication-checkbox"> Лейшманиоз
+                    </label>
+                </div>
+                <div class="contraindication-item">
+                    <label>
+                        <input type="checkbox" value="токсоплазмоз" class="contraindication-checkbox"> Токсоплазмоз
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button button-tertiary" id="cancel-contraindications">Отмена</button>
+                <button type="button" class="button button-primary" id="save-contraindications">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для просмотра ранее выявленных противопоказаний -->
+    <div id="previous-contraindications-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Ранее выявленные противопоказания</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="contraindication-list" id="previous-contraindications-list">
+                <!-- Этот список будет заполнен JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button button-primary" id="close-previous-contraindications">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Check if we're in read-only mode
         const isReadOnly = {% if read_only %}true{% else %}false{% endif %};
 
-        // If we're in read-only mode, disable the form functionality
+        // Противопоказания с их текстовыми метками (для отображения)
+        const contraindicationLabels = {
+            'сыпной_тиф': 'Сыпной тиф',
+            'туляремия': 'Туляремия',
+            'лепра': 'Лепра (болезнь Гансена)',
+            'африканский_трипаносомоз': 'Африканский трипаносомоз',
+            'болезнь_Чагаса': 'Болезнь Чагаса',
+            'лейшманиоз': 'Лейшманиоз',
+            'токсоплазмоз': 'Токсоплазмоз'
+        };
+
+        // DOM элементы для модального окна ранее выявленных противопоказаний
+        const openPreviousContraindicationsBtn = document.getElementById('open-previous-contraindications-modal');
+        const previousContraindicationsModal = document.getElementById('previous-contraindications-modal');
+        const closePreviousContraindicationsBtn = document.getElementById('close-previous-contraindications');
+        const previousContraindicationsList = document.getElementById('previous-contraindications-list');
+
+        // Получаем текущие (сохраненные) противопоказания из модели (если они есть)
+        const savedContraindications = {% if donor_card and donor_card.contraindications %}{{ donor_card.contraindications|safe }}{% else %}[]{% endif %};
+
+        // Функция для генерации случайной даты начиная с 1 февраля 2025
+        function getRandomDate() {
+            const start = new Date(2025, 1, 1); // 01.02.2025 (месяцы начинаются с 0)
+            const end = new Date();
+            end.setTime(start.getTime() + 60 * 24 * 60 * 60 * 1000); // Примерно два месяца после начальной даты
+
+            const randomTime = start.getTime() + Math.random() * (end.getTime() - start.getTime());
+            const randomDate = new Date(randomTime);
+
+            // Форматируем дату как ДД.ММ.ГГГГ
+            const day = String(randomDate.getDate()).padStart(2, '0');
+            const month = String(randomDate.getMonth() + 1).padStart(2, '0');
+            const year = randomDate.getFullYear();
+
+            return `${day}.${month}.${year}`;
+        }
+
+        // Открытие модального окна ранее выявленных противопоказаний
+        if (openPreviousContraindicationsBtn) {
+            openPreviousContraindicationsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Очищаем список
+                previousContraindicationsList.innerHTML = '';
+
+                // Если у донора есть противопоказания, отображаем их с датами
+                // Важно: используем savedContraindications (не текущие в процессе редактирования)
+                if (savedContraindications && savedContraindications.length > 0) {
+                    savedContraindications.forEach(contraindication => {
+                        const div = document.createElement('div');
+                        div.className = 'contraindication-row';
+                        div.innerHTML = `
+                            <div class="contraindication-name">${contraindicationLabels[contraindication] || contraindication}</div>
+                            <div class="contraindication-date">${getRandomDate()}</div>
+                        `;
+                        previousContraindicationsList.appendChild(div);
+                    });
+                } else {
+                    // Если противопоказаний нет, показываем сообщение
+                    const div = document.createElement('div');
+                    div.className = 'contraindication-row';
+                    div.innerHTML = `<div class="contraindication-name">Противопоказаний не выявлено</div>`;
+                    previousContraindicationsList.appendChild(div);
+                }
+
+                // Показываем модальное окно
+                previousContraindicationsModal.style.display = 'block';
+            });
+        }
+
+        // Закрытие модального окна ранее выявленных противопоказаний по нажатию на кнопку "Закрыть"
+        if (closePreviousContraindicationsBtn) {
+            closePreviousContraindicationsBtn.addEventListener('click', function() {
+                previousContraindicationsModal.style.display = 'none';
+            });
+        }
+
+        // Закрытие модального окна ранее выявленных противопоказаний по клику на крестик
+        previousContraindicationsModal.querySelector('.close-modal').addEventListener('click', function() {
+            previousContraindicationsModal.style.display = 'none';
+        });
+
+        // Закрытие модального окна ранее выявленных противопоказаний по клику вне его области
+        window.addEventListener('click', function(event) {
+            if (event.target === previousContraindicationsModal) {
+                previousContraindicationsModal.style.display = 'none';
+            }
+        });
+
+        // If we're in read-only mode, no need to initialize interactive elements
         if (isReadOnly) {
-            // No need to initialize interactive elements in read-only mode
             return;
         }
 
@@ -514,6 +783,75 @@
         const rhFactorSelect = document.getElementById('rh-factor');
         const kellFactorSelect = document.getElementById('kell-factor');
         const availableDonationTypesInput = document.getElementById('available-donation-types');
+
+        // Противопоказания
+        const openContraindicationsModalBtn = document.getElementById('open-contraindications-modal');
+        const contraindicationsModal = document.getElementById('contraindications-modal');
+        const closeModalBtn = document.querySelector('#contraindications-modal .close-modal');
+        const saveContraindicationsBtn = document.getElementById('save-contraindications');
+        const cancelContraindicationsBtn = document.getElementById('cancel-contraindications');
+        const selectedContraindicationsInput = document.getElementById('selected-contraindications');
+        const selectedContraindicationsCount = document.getElementById('selected-contraindications-count');
+        const contraindicationCheckboxes = document.querySelectorAll('.contraindication-checkbox');
+
+        // Уберем инициализацию чекбоксов на основе существующих данных
+        // Чекбоксы всегда начинаются пустыми
+
+        // Открытие модального окна
+        openContraindicationsModalBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Сбрасываем все чекбоксы перед открытием
+            contraindicationCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            contraindicationsModal.style.display = 'block';
+        });
+
+        // Закрытие модального окна по клику на крестик
+        closeModalBtn.addEventListener('click', function() {
+            contraindicationsModal.style.display = 'none';
+        });
+
+        // Закрытие модального окна по клику вне его области
+        window.addEventListener('click', function(event) {
+            if (event.target === contraindicationsModal) {
+                contraindicationsModal.style.display = 'none';
+            }
+        });
+
+        // Отмена изменений
+        cancelContraindicationsBtn.addEventListener('click', function() {
+            contraindicationsModal.style.display = 'none';
+        });
+
+        // Сохранение выбранных противопоказаний
+        saveContraindicationsBtn.addEventListener('click', function() {
+            // Получаем текущие выбранные противопоказания
+            let currentContraindications = selectedContraindicationsInput.value ?
+                                          selectedContraindicationsInput.value.split(',') :
+                                          [];
+
+            // Добавляем к ним новые выбранные
+            contraindicationCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    currentContraindications.push(checkbox.value);
+                }
+            });
+
+            // Обновляем значение в форме
+            selectedContraindicationsInput.value = currentContraindications.join(',');
+
+            // Обновляем счетчик
+            if (currentContraindications.length > 0) {
+                selectedContraindicationsCount.textContent = `Выбрано: ${currentContraindications.length}`;
+            } else {
+                selectedContraindicationsCount.textContent = 'Противопоказаний не выявлено';
+            }
+
+            contraindicationsModal.style.display = 'none';
+        });
 
         // Set up donation type selection
         const donationTypes = document.querySelectorAll('.donation-type');
@@ -569,6 +907,11 @@
                 type.classList.remove('selected');
             });
             availableDonationTypesInput.value = '';
+
+            // Clear contraindications
+            selectedContraindicationsInput.value = '';
+            selectedContraindicationsCount.textContent = 'Противопоказаний не выявлено';
+            // НЕ сбрасываем счетчик предыдущих противопоказаний, так как они должны оставаться неизменными
         });
 
         // Initialize selected donation types

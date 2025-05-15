@@ -12,7 +12,8 @@ django.setup()
 
 from LinaSiteApp.models import (
     BloodComponent, Donor, Donation, Payment, DirectionBase,
-    DonationDirection, ExaminationDirection, BloodAnalysisDirection, ExternalDirection
+    DonationDirection, ExaminationDirection, BloodAnalysisDirection, ExternalDirection,
+    DonorCard
 )
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
@@ -42,6 +43,7 @@ def generate_test_data():
     DonationDirection.objects.all().delete()
     Payment.objects.all().delete()
     Donation.objects.all().delete()
+    DonorCard.objects.all().delete()  # Добавлена очистка DonorCard
     Donor.objects.all().delete()
     BloodComponent.objects.all().delete()
 
@@ -98,7 +100,9 @@ def generate_test_data():
 
         blood_group = random.choice(blood_groups)
         rh_factor = blood_group[-1]  # Берем из группы крови
-
+        height = random.randint(150, 200)
+        weight = Decimal(str(random.uniform(55.0, 100.0))).quantize(Decimal('0.1'))
+        from transliterate import translit
         donor = Donor.objects.create(
             snils=generate_random_snils(),
             last_name=last_name,
@@ -107,22 +111,55 @@ def generate_test_data():
             blood_group=blood_group,
             rh_factor=rh_factor,
             kell_factor=random.choice(kell_factors),
-            last_weight=Decimal(str(random.uniform(55.0, 100.0))).quantize(Decimal('0.01')),
+            last_weight=weight,
             last_pressure=f"{random.randint(100, 140)}/{random.randint(60, 90)}",
             is_regular=random.choice([True, False]),
             donation_count=random.randint(0, 20),
             document_number=f"Паспорт {random.randint(4000, 5000)} {random.randint(100000, 999999)}",
             registration_address=f"г. Москва, ул. {random.choice(['Ленина', 'Пушкина', 'Гагарина', 'Мира', 'Советская'])}, д. {random.randint(1, 100)}, кв. {random.randint(1, 100)}",
             fact_address=f"г. Москва, ул. {random.choice(['Ленина', 'Пушкина', 'Гагарина', 'Мира', 'Советская'])}, д. {random.randint(1, 100)}, кв. {random.randint(1, 100)}",
-            height=random.randint(150, 200)
+            height=height,
+            phone=f"+7{random.randint(9000000000, 9999999999)}",
+            # random letters
+            email = translit(f"{first_name}{last_name}", 'ru', reversed=True).lower() + "@example.com"
         )
 
         # Добавляем компоненты крови донору
         donor_components = random.sample(blood_components, random.randint(1, 4))
         donor.blood_components.set(donor_components)
 
+        # Создаем карточку донора
+        # Получаем список названий компонентов крови для доступных типов донаций
+        available_donation_types = []
+        for component in donor_components:
+            if component.name == "Эритроциты":
+                available_donation_types.append("erythrocytes")
+            elif component.name == "Тромбоциты":
+                available_donation_types.append("platelets")
+            elif component.name == "Плазма":
+                available_donation_types.append("plasma")
+            elif component.name == "Цельная кровь":
+                available_donation_types.append("whole_blood")
+            elif component.name == "Гранулоциты":
+                available_donation_types.append("granulocytes")
+
+        # Создаем карточку донора
+        birth_date = date.today() - timedelta(days=random.randint(6570, 18250))  # от 18 до 50 лет
+        donor_card = DonorCard.objects.create(
+            donor=donor,
+            birth_date=birth_date,
+            contraindications=[],
+            height=height,
+            weight=weight,
+            blood_group=blood_group,
+            rh_factor=rh_factor,
+            kell_factor=donor.kell_factor,
+            available_donation_types=available_donation_types
+        )
+
         donors.append(donor)
         print(f"Создан донор: {donor}")
+        print(f"Создана карточка донора: {donor_card}")
 
     # Создание донаций - используем только значения из DONATION_TYPE_CHOICES
     donations = []
@@ -135,7 +172,7 @@ def generate_test_data():
     for donor in donors:
         # Для каждого донора создаем 1-3 донации
         for _ in range(random.randint(1, 3)):
-            donation_date = date.today() - timedelta(days=random.randint(1, 365))
+            donation_date = date.today() - timedelta(days=random.randint(1, 105))
 
             donation = Donation.objects.create(
                 donor=donor,
@@ -175,7 +212,7 @@ def generate_test_data():
                     payment_method=random.choice(['accumulative', 'standard']),
                     is_paid_donation=True,
                     food_compensation=random.choice([True, False]),
-                    amount=Decimal(str(random.uniform(1000.0, 5000.0))).quantize(Decimal('0.01')),
+                    amount=Decimal(str(random.uniform(1000.0, 5000.0))).quantize(Decimal('0.1')),
                     document_id=donor.document_number,
                     document_type="Паспорт",
                     payment_type=random.choice(['social_support', 'payment', 'compensation']),
@@ -187,12 +224,13 @@ def generate_test_data():
     # Создание направлений на донацию
     for donor in donors:
         if random.choice([True, False]):
-            for _ in range(random.randint(1, 2)):
-                direction_date = date.today() + timedelta(days=random.randint(1, 30))
+            for _ in range(random.randint(1, 4)):
+                planned_donation_date = datetime.strptime("2025-02-01", "%Y-%m-%d") + timedelta(days=random.randint(1, 105))
 
                 donation_direction = DonationDirection.objects.create(
                     donor=donor,
-                    direction_date=direction_date,
+                    direction_date=planned_donation_date,
+                    created_at=planned_donation_date,
                     blood_group=donor.blood_group,
                     rh_factor=donor.rh_factor,
                     document_number=donor.document_number,
@@ -209,8 +247,8 @@ def generate_test_data():
     # Создание направлений на осмотр - используем только варианты YES_NO_CHOICES из моделей
     for donor in donors:
         if random.choice([True, False]):
-            for _ in range(random.randint(1, 2)):
-                planned_donation_date = date.today() + timedelta(days=random.randint(1, 30))
+            for _ in range(random.randint(1, 4)):
+                planned_donation_date = datetime.strptime("2025-02-01", "%Y-%m-%d") + timedelta(days=random.randint(1, 105))
 
                 examination_direction = ExaminationDirection.objects.create(
                     donor=donor,
@@ -239,12 +277,13 @@ def generate_test_data():
     # Создание направлений на анализ крови
     for donor in donors:
         if random.choice([True, False]):
-            for _ in range(random.randint(1, 2)):
-                planned_donation_date = date.today() + timedelta(days=random.randint(1, 30))
+            for _ in range(random.randint(1, 4)):
+                planned_donation_date = datetime.strptime("2025-02-01", "%Y-%m-%d") + timedelta(days=random.randint(1, 105))
 
                 blood_analysis_direction = BloodAnalysisDirection.objects.create(
                     donor=donor,
                     planned_donation_date=planned_donation_date,
+                    created_at=planned_donation_date,
                     document_number=donor.document_number,
                     donation_type=random.choice(donation_types),
                     blood_group=donor.blood_group,
@@ -269,7 +308,7 @@ def generate_test_data():
     research_types = ['ecg', 'self_sample', 'ent', 'blood_test', 'urine_test', 'ultrasound', 'other']
     for donor in donors:
         if random.choice([True, False]):
-            for _ in range(random.randint(1, 2)):
+            for _ in range(random.randint(1, 4)):
                 issue_date = date.today()
                 start_date = issue_date + timedelta(days=random.randint(1, 7))
                 end_date = start_date + timedelta(days=random.randint(14, 30))

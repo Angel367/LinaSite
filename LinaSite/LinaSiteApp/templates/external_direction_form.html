@@ -222,7 +222,7 @@
         .read-only-hidden {
             display: none !important;
         }
-                #user-info {
+        #user-info {
             position: fixed;
             top: 10px;
             right: 15px;
@@ -271,11 +271,17 @@
 
         {% if read_only %}
         <div class="read-only-notice">
-            <p>Просмотр направления. Все поля доступны только для чтения.</p>
+            <p>Просмотр направления.</p>
         </div>
         {% endif %}
 
-        <form id="external-direction-form" method="post" action="{% if not read_only %}{% url 'external_direction_create' %}{% endif %}">
+        {% if edit_mode %}
+        <div class="read-only-notice">
+            <p>Режим редактирования направления.</p>
+        </div>
+        {% endif %}
+
+        <form id="external-direction-form" method="post" action="{% if edit_mode %}{% url 'external_direction_update' direction.id %}{% elif not read_only %}{% url 'external_direction_create' %}{% endif %}">
             {% csrf_token %}
 
             <div class="form-layout">
@@ -283,7 +289,7 @@
                     <div class="form-group">
                         <label class="form-label">Донор*</label>
                         <div class="custom-select">
-                            <select id="donor-select" name="donor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="donor-select" name="donor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите донора</option>
                                 {% for donor in donors %}
                                     <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
@@ -295,7 +301,7 @@
                     <div class="form-group">
                         <label class="form-label">Дата выдачи*</label>
                         <div class="custom-select">
-                            <select id="issue-date" name="issue_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="issue-date" name="issue_date" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите дату выдачи</option>
                                 {% for date in available_dates %}
                                     <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.issue_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
@@ -307,7 +313,7 @@
                     <div class="form-group">
                         <label class="form-label">Дата начала действия*</label>
                         <div class="custom-select">
-                            <select id="start-date" name="start_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="start-date" name="start_date" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите дату начала</option>
                                 {% for date in available_dates %}
                                     <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.start_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
@@ -319,7 +325,7 @@
                     <div class="form-group">
                         <label class="form-label">Дата завершения*</label>
                         <div class="custom-select">
-                            <select id="end-date" name="end_date" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="end-date" name="end_date" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите дату завершения</option>
                                 {% for date in expiry_dates %}
                                     <option value="{{ date|date:'Y-m-d' }}" {% if direction and direction.end_date == date %}selected{% endif %}>{{ date|date:'d.m.Y' }}</option>
@@ -331,7 +337,7 @@
                     <div class="form-group">
                         <label class="form-label">Тип исследования*</label>
                         <div class="custom-select">
-                            <select id="research-type" name="research_type" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            <select id="research-type" name="research_type" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите тип исследования</option>
                                 <option value="ecg" {% if direction and direction.research_type == 'ecg' %}selected{% endif %}>ЭКГ</option>
                                 <option value="self_sample" {% if direction and direction.research_type == 'self_sample' %}selected{% endif %}>Анализ самозаборных материалов</option>
@@ -350,27 +356,37 @@
                 <div class="form-right">
                     <div class="form-group">
                         <label class="form-label">Адрес поликлиники</label>
-                        <input type="text" id="clinic-address" name="clinic_address" class="text-input {% if read_only %}read-only-input{% endif %}" {% if read_only %}readonly{% endif %} value="{% if direction %}{{ direction.clinic_address }}{% endif %}">
+                        <input type="text" id="clinic-address" name="clinic_address" class="text-input {% if read_only and not edit_mode %}read-only-input{% endif %}" {% if read_only and not edit_mode %}readonly{% endif %} value="{% if direction %}{{ direction.clinic_address }}{% endif %}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Причина выдачи направления</label>
-                        <textarea id="issue-reason" name="issue_reason" class="textarea-input {% if read_only %}read-only-input{% endif %}" {% if read_only %}readonly{% endif %}>{% if direction %}{{ direction.issue_reason }}{% endif %}</textarea>
+                        <textarea id="issue-reason" name="issue_reason" class="textarea-input {% if read_only and not edit_mode %}read-only-input{% endif %}" {% if read_only and not edit_mode %}readonly{% endif %}>{% if direction %}{{ direction.issue_reason }}{% endif %}</textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Regular buttons (hidden in read-only mode) -->
-            <div class="buttons-container {% if read_only %}read-only-hidden{% endif %}">
+            <!-- Regular buttons (shown in creation mode) -->
+            <div class="buttons-container {% if read_only or edit_mode %}read-only-hidden{% endif %}">
                 <button type="submit" class="button button-primary">Применить</button>
                 <button type="reset" id="reset-button" class="button button-secondary">Сбросить</button>
                 <a href="{% url 'direction_search' %}" class="button button-tertiary">Вернуться</a>
             </div>
 
-            <!-- Back button (shown only in read-only mode) -->
-            {% if read_only %}
+            <!-- Edit mode buttons (shown only in edit mode) -->
+            <div class="buttons-container {% if not edit_mode %}read-only-hidden{% endif %}">
+                <button type="submit" class="button button-primary">Сохранить изменения</button>
+                <a href="{% if direction %}{% url 'external_direction_view' direction.id %}{% else %}{% url 'direction_search' %}{% endif %}" class="button button-secondary">Отменить</a>
+                <a href="{% url 'direction_search' %}" class="button button-tertiary">Вернуться к поиску</a>
+            </div>
+
+            <!-- View mode buttons (shown only in read-only mode) -->
+            {% if read_only and not edit_mode %}
             <div class="buttons-container">
-                <a href="{% url 'direction_search' %}" class="button button-primary">Вернуться к поиску</a>
+                {% if can_edit %}
+                <a href="{% url 'external_direction_edit' direction.id %}" class="button button-primary">Редактировать</a>
+                {% endif %}
+                <a href="{% url 'direction_search' %}" class="button button-tertiary">Вернуться к поиску</a>
             </div>
             {% endif %}
         </form>
@@ -378,11 +394,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Check if we're in read-only mode
-        const isReadOnly = {% if read_only %}true{% else %}false{% endif %};
+        // Check if we're in read-only mode or edit mode
+        const isReadOnly = {% if read_only and not edit_mode %}true{% else %}false{% endif %};
+        const isEditMode = {% if edit_mode %}true{% else %}false{% endif %};
 
-        // If we're in read-only mode, disable the form functionality
-        if (isReadOnly) {
+        // If we're in read-only mode and not in edit mode, disable the form functionality
+        if (isReadOnly && !isEditMode) {
             // No need to initialize interactive elements in read-only mode
             return;
         }
@@ -395,41 +412,51 @@
         const resetButton = document.getElementById('reset-button');
 
         // Обработка выбора даты выдачи - автоматически устанавливает дату начала действия на ту же дату
-        issueDateSelect.addEventListener('change', function() {
-            startDateSelect.value = this.value;
+        // Только если мы не в режиме редактирования, либо если в режиме редактирования изменена дата выдачи
+        if (!isEditMode) {
+            issueDateSelect.addEventListener('change', function() {
+                startDateSelect.value = this.value;
 
-            // Вычисляем дату завершения (+ 30 дней по умолчанию)
-            if (this.value) {
-                const issueDate = new Date(this.value);
-                const endDate = new Date(issueDate);
-                endDate.setDate(endDate.getDate() + 30);
+                // Вычисляем дату завершения (+ 30 дней по умолчанию)
+                if (this.value) {
+                    const issueDate = new Date(this.value);
+                    const endDate = new Date(issueDate);
+                    endDate.setDate(endDate.getDate() + 30);
 
-                // Находим ближайшую доступную дату для даты завершения
-                const endDateOptions = Array.from(endDateSelect.options).map(option => option.value);
-                let closestEndDate = null;
-                let minDiff = Number.MAX_SAFE_INTEGER;
+                    // Находим ближайшую доступную дату для даты завершения
+                    const endDateOptions = Array.from(endDateSelect.options).map(option => option.value);
+                    let closestEndDate = null;
+                    let minDiff = Number.MAX_SAFE_INTEGER;
 
-                endDateOptions.forEach(dateStr => {
-                    if (dateStr) {
-                        const date = new Date(dateStr);
-                        const diff = Math.abs(date - endDate);
-                        if (diff < minDiff) {
-                            minDiff = diff;
-                            closestEndDate = dateStr;
+                    endDateOptions.forEach(dateStr => {
+                        if (dateStr) {
+                            const date = new Date(dateStr);
+                            const diff = Math.abs(date - endDate);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                closestEndDate = dateStr;
+                            }
                         }
-                    }
-                });
+                    });
 
-                if (closestEndDate) {
-                    endDateSelect.value = closestEndDate;
+                    if (closestEndDate) {
+                        endDateSelect.value = closestEndDate;
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // Обработка сброса формы
         resetButton.addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('external-direction-form').reset();
+
+            if (isEditMode) {
+                // В режиме редактирования возвращаем к исходным значениям
+                window.location.reload();
+            } else {
+                // В режиме создания полностью очищаем форму
+                document.getElementById('external-direction-form').reset();
+            }
         });
 
         // Обработка отправки формы

@@ -315,7 +315,7 @@
                     <div class="form-group">
                         <label class="form-label">Донор</label>
                         <div class="select-container">
-                            <select id="donor-select" name="donor" required>
+                            <select id="donor-select" name="donor">
                                 <option value="">Выберите донора</option>
                                 {% for donor in donors %}
                                     <option value="{{ donor.id }}">{{ donor.get_full_name }}</option>
@@ -524,6 +524,24 @@
         const donorAddressField = document.getElementById('donor-address');
         const donationTypeField = document.getElementById('donation-type');
         const componentsField = document.getElementById('components');
+        const firstDonationCheckbox = document.getElementById('first-donation');
+
+        // Обработчик для чекбокса "Донор пришел в первый раз"
+        firstDonationCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Если чекбокс отмечен, блокируем выбор донора
+                donorSelect.disabled = true;
+                donorSelect.value = ""; // Очищаем выбор донора
+                
+                // Очищаем поля информации о доноре
+                snilsField.value = '';
+                documentNumberField.value = '';
+                donorAddressField.value = '';
+            } else {
+                // Если чекбокс снят, разблокируем выбор донора
+                donorSelect.disabled = false;
+            }
+        });
 
         // Компоненты крови
         const componentOptions = document.querySelectorAll('.component-option');
@@ -615,7 +633,24 @@
                 return;
             }
 
-            // Дополнительные проверки можно добавить здесь
+            // Проверка на выбор донора или первая донация
+            const isDonorSelected = donorSelect.value !== "";
+            const isFirstDonation = firstDonationCheckbox.checked;
+            
+            if (!isDonorSelected && !isFirstDonation) {
+                alert('Пожалуйста, выберите донора или отметьте, что это первая донация');
+                event.preventDefault();
+                return;
+            }
+
+            // Если это первая донация, убедитесь, что СНИЛС и номер документа заполнены
+            if (isFirstDonation) {
+                if (!snilsField.value || !documentNumberField.value) {
+                    alert('Для нового донора необходимо указать СНИЛС и номер документа');
+                    event.preventDefault();
+                    return;
+                }
+            }
         });
     });
 </script>
