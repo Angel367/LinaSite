@@ -17,10 +17,10 @@ class BloodComponent(models.Model):
 
 class Donor(models.Model):
     BLOOD_GROUP_CHOICES = [
-        ('O-', 'O-'), ('O+', 'O+'),
-        ('A-', 'A-'), ('A+', 'A+'),
-        ('B-', 'B-'), ('B+', 'B+'),
-        ('AB-', 'AB-'), ('AB+', 'AB+')
+        ('O', 'O'),
+        ('A', 'A'),
+        ('B', 'B'),
+        ('AB', 'AB'),
     ]
 
     RH_FACTOR_CHOICES = [('+', 'Положительный'), ('-', 'Отрицательный')]

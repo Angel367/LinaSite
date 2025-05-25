@@ -1571,10 +1571,13 @@ def external_direction_update(request, direction_id):
         })
 
 
-def external_direction_form(request):
+def external_direction_form(request, donor_id=None):
     """View to display the external direction form"""
     donors = Donor.objects.all().order_by('last_name', 'first_name')
-
+    if donor_id:
+        donor = donors.get(id=donor_id)
+    else:
+        donor = None
     # Generate dates for the next 30 days for issue date and start date
     today = datetime.date.today()
     available_dates = [today + datetime.timedelta(days=i) for i in range(30)]
@@ -1584,6 +1587,7 @@ def external_direction_form(request):
 
     context = {
         'donors': donors,
+        'donor_pre_inf': donor,
         'available_dates': available_dates,
         'expiry_dates': expiry_dates,
     }
@@ -1648,7 +1652,7 @@ def external_direction_view(request, direction_id):
     except KeyError:
         return render(request, 'direction_menu.html', {"is_first_button": False})
 
-    if current_user_role == 'specialist_med_cart':
+    if current_user_role == 'specialist_med_cart' or current_user_role == 'registrator':
         can_edit = True
     else:
         can_edit = False
@@ -1807,16 +1811,20 @@ def get_next_donation_id():
     return max_id + 1
 
 
-def donation_form(request):
+def donation_form(request, donor_id=None):
     """View to display the donation creation form"""
     donors = Donor.objects.all().order_by('last_name', 'first_name')
-
+    if donor_id:
+        donor = donors.get(id=donor_id)
+    else:
+        donor = None
     # Generate dates for the next 30 days
     today = datetime.date.today()
     available_dates = [today - datetime.timedelta(days=i) for i in range(30)]  # Past dates for donation
 
     context = {
         'donors': donors,
+        'donor_pre_inf': donor,
         'available_dates': available_dates,
         'next_donation_id': get_next_donation_id(),
         'is_edit': False
@@ -1856,7 +1864,7 @@ def donation_create(request):
         donor.save()
 
         # Redirect to a success page or listing
-        return redirect('donation_search')
+        return redirect(f'/app/donation/view/{donation.id}')
     except Exception as e:
         # Handle errors
         today = datetime.date.today()
@@ -1874,6 +1882,7 @@ def donation_view(request, donation_id):
     """View a donation in read-only mode"""
     donation = get_object_or_404(Donation, id=donation_id)
     donors = Donor.objects.all().order_by('last_name', 'first_name')
+    donor = Donor.objects.get(id=donation.donor.id)
 
     # Generate dates to populate dropdowns in read-only mode
     available_dates = [donation.donation_date]
@@ -1887,6 +1896,7 @@ def donation_view(request, donation_id):
     context = {
         'donation': donation,
         'donors': donors,
+        'donor_pre_inf': donor,
         'available_dates': available_dates,
         'read_only': True,
         'is_edit': is_edit,  # You can control this based on permissions,

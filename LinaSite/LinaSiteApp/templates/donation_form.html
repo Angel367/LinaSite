@@ -346,12 +346,19 @@
                     <div class="form-group">
                         <label class="form-label">Донор*</label>
                         <div class="custom-select">
-                            <select id="donor-select" name="donor" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
+                            {% if donor_pre_inf %}
+                            <select id="donor-select" name="donor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
+                                    <option value="">Выберите донора</option>
+                                    <option value="{{ donor_pre_inf.id }}" {% if direction and direction.donor_pre_inf.id == donor_pre_inf.id %}selected{% endif %}>{{ donor_pre_inf.get_full_name }}</option>
+                            </select>
+                            {% else %}
+                            <select id="donor-select" name="donor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите донора</option>
                                 {% for donor in donors %}
-                                    <option value="{{ donor.id }}" {% if donation and donation.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
+                                    <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
                                 {% endfor %}
                             </select>
+                        {% endif %}
                         </div>
                     </div>
 
@@ -361,7 +368,7 @@
                     </div>
 
                     <div class="form-group donation-type-container">
-                        <label class="donation-type-label">Выберите тип донации</label>
+                        <label class="donation-type-label">Выберите тип донации*</label>
                         <div class="donation-types">
                             <div class="donation-type {% if donation and donation.donation_type == 'whole_blood' %}selected{% endif %}" data-type="whole_blood" {% if read_only %}style="pointer-events: none;"{% endif %}>
                                 Цельная кровь
@@ -389,14 +396,10 @@
                         <div class="custom-select">
                             <select id="blood-group" name="blood_group" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
                                 <option value="">Группа крови</option>
-                                <option value="O-" {% if donation.donor.blood_group == 'O-' %}selected{% endif %}>O-</option>
-                                <option value="O+" {% if donation.donor.blood_group == 'O+' %}selected{% endif %}>O+</option>
-                                <option value="A-" {% if donation.donor.blood_group == 'A-' %}selected{% endif %}>A-</option>
-                                <option value="A+" {% if donation.donor.blood_group == 'A+' %}selected{% endif %}>A+</option>
-                                <option value="B-" {% if donation.donor.blood_group == 'B-' %}selected{% endif %}>B-</option>
-                                <option value="B+" {% if donation.donor.blood_group == 'B+' %}selected{% endif %}>B+</option>
-                                <option value="AB-" {% if donation.donor.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
-                                <option value="AB+" {% if donation.donor.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                                <option value="O" {% if donation.donor.blood_group == 'O' %}selected{% endif %}>O</option>
+                                <option value="A" {% if donation.donor.blood_group == 'A' %}selected{% endif %}>A</option>
+                                <option value="B" {% if donation.donor.blood_group == 'B' %}selected{% endif %}>B</option>
+                                <option value="AB" {% if donation.donor.blood_group == 'AB' %}selected{% endif %}>AB</option>
                             </select>
                         </div>
                     </div>

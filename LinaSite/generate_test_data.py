@@ -76,7 +76,7 @@ def generate_test_data():
                     "Николаевна"]
 
     # Используем только те значения, которые определены в моделях
-    blood_groups = ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']
+    blood_groups = ['O', 'A', 'B', 'AB']
     rh_factors = ['+', '-']
     kell_factors = ['+', '-']
 
@@ -99,7 +99,7 @@ def generate_test_data():
             middle_name = random.choice([n for n in middle_names if n.endswith('на')])
 
         blood_group = random.choice(blood_groups)
-        rh_factor = blood_group[-1]  # Берем из группы крови
+        rh_factor = random.choice(rh_factors)
         height = random.randint(150, 200)
         weight = Decimal(str(random.uniform(55.0, 100.0))).quantize(Decimal('0.1'))
         from transliterate import translit

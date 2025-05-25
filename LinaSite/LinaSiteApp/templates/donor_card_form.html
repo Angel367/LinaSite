@@ -481,14 +481,10 @@
                         <div class="custom-select">
                             <select id="blood-group" name="blood_group" required {% if read_only %}disabled{% endif %} class="{% if read_only %}read-only-input{% endif %}">
                                 <option value="">Выберите группу крови</option>
-                                <option value="O-" {% if donor_card and donor_card.blood_group == 'O-' %}selected{% endif %}>O-</option>
-                                <option value="O+" {% if donor_card and donor_card.blood_group == 'O+' %}selected{% endif %}>O+</option>
-                                <option value="A-" {% if donor_card and donor_card.blood_group == 'A-' %}selected{% endif %}>A-</option>
-                                <option value="A+" {% if donor_card and donor_card.blood_group == 'A+' %}selected{% endif %}>A+</option>
-                                <option value="B-" {% if donor_card and donor_card.blood_group == 'B-' %}selected{% endif %}>B-</option>
-                                <option value="B+" {% if donor_card and donor_card.blood_group == 'B+' %}selected{% endif %}>B+</option>
-                                <option value="AB-" {% if donor_card and donor_card.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
-                                <option value="AB+" {% if donor_card and donor_card.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                                <option value="O" {% if donor_card and donor_card.blood_group == 'O' %}selected{% endif %}>O</option>
+                                <option value="A" {% if donor_card and donor_card.blood_group == 'A' %}selected{% endif %}>A</option>
+                                <option value="B" {% if donor_card and donor_card.blood_group == 'B' %}selected{% endif %}>B</option>
+                                <option value="AB" {% if donor_card and donor_card.blood_group == 'AB' %}selected{% endif %}>AB</option>
                             </select>
                         </div>
                     </div>

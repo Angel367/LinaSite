@@ -485,14 +485,14 @@
                         <div class="radio-card-container">
                             <label class="radio-card" for="directions-required">
                                 <input type="radio" id="directions-required" name="directions_needed" value="required">
-                                <div class="radio-card-title" onclick="window.location.href=`/app/external-direction/create/`">
+                                <div class="radio-card-title" onclick="window.location.href=`/app/external-direction/create/${document.getElementById('donor-select').value}/`">
                                     <span class="radio-custom-circle"></span>
                                     Направления необходимы
                                 </div>
                                 <div class="radio-card-desc">
                                     Прошел срок действия предыдущих медицинских исследований
                                 </div>
-                                <div class="arrow-icon"  onclick="window.location.href=`/app/external-direction/create/`">›</div>
+                                <div class="arrow-icon"  onclick="window.location.href=`/app/external-direction/create/${document.getElementById('donor-select').value}/`">›</div>
                             </label>
                             
                             <label class="radio-card" for="directions-not-required">

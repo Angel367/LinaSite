@@ -289,12 +289,19 @@
                     <div class="form-group">
                         <label class="form-label">Донор*</label>
                         <div class="custom-select">
+                            {% if donor_pre_inf %}
+                            <select id="donor-select" name="donor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
+                                    <option value="">Выберите донора</option>
+                                    <option value="{{ donor_pre_inf.id }}" {% if direction and direction.donor_pre_inf.id == donor_pre_inf.id %}selected{% endif %}>{{ donor_pre_inf.get_full_name }}</option>
+                            </select>
+                            {% else %}
                             <select id="donor-select" name="donor" required {% if read_only and not edit_mode %}disabled{% endif %} class="{% if read_only and not edit_mode %}read-only-input{% endif %}">
                                 <option value="">Выберите донора</option>
                                 {% for donor in donors %}
                                     <option value="{{ donor.id }}" {% if direction and direction.donor.id == donor.id %}selected{% endif %}>{{ donor.get_full_name }}</option>
                                 {% endfor %}
                             </select>
+                        {% endif %}
                         </div>
                     </div>
 
@@ -370,14 +377,14 @@
             <div class="buttons-container {% if read_only or edit_mode %}read-only-hidden{% endif %}">
                 <button type="submit" class="button button-primary">Применить</button>
                 <button type="reset" id="reset-button" class="button button-secondary">Сбросить</button>
-                <a href="{% url 'direction_search' %}" class="button button-tertiary">Вернуться</a>
+                <a href="#" onclick="window.history.back(); return false;" class="button button-tertiary">Вернуться</a>
             </div>
 
             <!-- Edit mode buttons (shown only in edit mode) -->
             <div class="buttons-container {% if not edit_mode %}read-only-hidden{% endif %}">
                 <button type="submit" class="button button-primary">Сохранить изменения</button>
                 <a href="{% if direction %}{% url 'external_direction_view' direction.id %}{% else %}{% url 'direction_search' %}{% endif %}" class="button button-secondary">Отменить</a>
-                <a href="{% url 'direction_search' %}" class="button button-tertiary">Вернуться к поиску</a>
+                <a href="#" onclick="window.history.back(); return false;" class="button button-tertiary">Вернуться</a>
             </div>
 
             <!-- View mode buttons (shown only in read-only mode) -->
@@ -386,7 +393,7 @@
                 {% if can_edit %}
                 <a href="{% url 'external_direction_edit' direction.id %}" class="button button-primary">Редактировать</a>
                 {% endif %}
-                <a href="{% url 'direction_search' %}" class="button button-tertiary">Вернуться к поиску</a>
+                <a href="#" onclick="window.history.back(); return false;" class="button button-tertiary">Вернуться</a>
             </div>
             {% endif %}
         </form>
