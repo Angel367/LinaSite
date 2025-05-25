@@ -320,8 +320,7 @@ def create_base_direction(sender, instance, created, **kwargs):
         if type(instance.direction_date) is str:
             # Convert string to date object
             instance.direction_date = datetime.datetime.strptime(instance.direction_date, "%Y-%m-%d").date()
-        else:
-            f = instance.direction_date
+        f = instance.direction_date
         expiry_date = f + datetime.timedelta(days=30)
 
         DirectionBase.objects.create(

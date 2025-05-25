@@ -738,12 +738,12 @@
                             rhFactorField.value = data.rh_factor || '';
 
                             // Заполняем последние известные показатели, если они есть
-                            if (data.last_weight) {
-                                weightField.value = data.last_weight;
-                            }
-                            if (data.last_pressure) {
-                                bloodPressureField.value = data.last_pressure;
-                            }
+                            {#if (data.last_weight) {#}
+                            {#    weightField.value = data.last_weight;#}
+                            {#}#}
+                            {#if (data.last_pressure) {#}
+                            {#    bloodPressureField.value = data.last_pressure;#}
+                            {#}#}
                             if (data.last_height) {
                                 heightField.value = data.last_height;
                             }

@@ -268,6 +268,7 @@ def get_donor_info(request, donor_id):
             'kell_factor': donor.kell_factor,
             'last_weight': str(donor.last_weight),
             'last_pressure': donor.last_pressure,
+            'last_height': donor.height,
             'address': donor.address if hasattr(donor, 'address') else '',
             'document_number': donor.document_number if hasattr(donor, 'document_number') else '',
         })
@@ -368,7 +369,7 @@ def payment_register(request):
                 file=application_file
             )
 
-        return redirect('payment_search')  # Перенаправляем на поиск выплат
+        return redirect(f'/app/payment/{payment.id}/details')  # Перенаправляем на поиск выплат
 
     # Для GET-запроса отображаем форму
     donations = Donation.objects.all().order_by('-donation_date')
@@ -447,7 +448,7 @@ def payment_search(request):
     document_type = request.GET.get('document_type', '')
 
     # Инициализируем базовые queryset
-    payments = Payment.objects.all().select_related('donor', 'donation').order_by('-payment_date')
+    payments = Payment.objects.all().select_related('donor', 'donation').order_by('created_at')
 
     # Применяем общие фильтры
     if donor_id:
@@ -717,9 +718,10 @@ def donation_direction_create(request):
         direction.save()
 
         # Redirect to a success page or listing
-        return redirect('donation_direction_list')
+        return redirect('/app/donation-direction/view/' + str(direction.id) + '/')
     except Exception as e:
         # Handle errors
+        print(e)
         return render(request, 'direction_donation.html', {
             'error_message': str(e),
             'donors': Donor.objects.all().order_by('last_name', 'first_name'),
@@ -1882,7 +1884,10 @@ def donation_view(request, donation_id):
     """View a donation in read-only mode"""
     donation = get_object_or_404(Donation, id=donation_id)
     donors = Donor.objects.all().order_by('last_name', 'first_name')
-    donor = Donor.objects.get(id=donation.donor.id)
+    if 'view' in request.path:
+        donor = None
+    else:
+        donor = Donor.objects.get(id=donation.donor.id)
 
     # Generate dates to populate dropdowns in read-only mode
     available_dates = [donation.donation_date]

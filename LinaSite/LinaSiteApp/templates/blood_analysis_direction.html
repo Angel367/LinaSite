@@ -551,28 +551,28 @@
                     .then(data => {
                         if (data.success && data.last_analysis) {
                             // Автозаполняем последние значения анализа, если они доступны
-                            if (data.last_analysis.hemoglobin)
-                                document.getElementById('hemoglobin').value = data.last_analysis.hemoglobin;
-                            if (data.last_analysis.erythrocytes_count)
-                                document.getElementById('erythrocytes-count').value = data.last_analysis.erythrocytes_count;
-                            if (data.last_analysis.platelets_count)
-                                document.getElementById('platelets-count').value = data.last_analysis.platelets_count;
-                            if (data.last_analysis.leukocytes_count)
-                                document.getElementById('leukocytes-count').value = data.last_analysis.leukocytes_count;
-                            if (data.last_analysis.albumin)
-                                document.getElementById('albumin').value = data.last_analysis.albumin;
-                            if (data.last_analysis.globulin)
-                                document.getElementById('globulin').value = data.last_analysis.globulin;
-                            if (data.last_analysis.soe)
-                                document.getElementById('soe').value = data.last_analysis.soe;
-                            if (data.last_analysis.hct)
-                                document.getElementById('hct').value = data.last_analysis.hct;
-                            if (data.last_analysis.mcv)
-                                document.getElementById('mcv').value = data.last_analysis.mcv;
-                            if (data.last_analysis.mch)
-                                document.getElementById('mch').value = data.last_analysis.mch;
-                            if (data.last_analysis.mchc)
-                                document.getElementById('mchc').value = data.last_analysis.mchc;
+                            {#if (data.last_analysis.hemoglobin)#}
+                            {#    document.getElementById('hemoglobin').value = data.last_analysis.hemoglobin;#}
+                            {#if (data.last_analysis.erythrocytes_count)#}
+                            {#    document.getElementById('erythrocytes-count').value = data.last_analysis.erythrocytes_count;#}
+                            {#if (data.last_analysis.platelets_count)#}
+                            {#    document.getElementById('platelets-count').value = data.last_analysis.platelets_count;#}
+                            {#if (data.last_analysis.leukocytes_count)#}
+                            {#    document.getElementById('leukocytes-count').value = data.last_analysis.leukocytes_count;#}
+                            {#if (data.last_analysis.albumin)#}
+                            {#    document.getElementById('albumin').value = data.last_analysis.albumin;#}
+                            {#if (data.last_analysis.globulin)#}
+                            {#    document.getElementById('globulin').value = data.last_analysis.globulin;#}
+                            {#if (data.last_analysis.soe)#}
+                            {#    document.getElementById('soe').value = data.last_analysis.soe;#}
+                            {#if (data.last_analysis.hct)#}
+                            {#    document.getElementById('hct').value = data.last_analysis.hct;#}
+                            {#if (data.last_analysis.mcv)#}
+                            {#    document.getElementById('mcv').value = data.last_analysis.mcv;#}
+                            {#if (data.last_analysis.mch)#}
+                            {#    document.getElementById('mch').value = data.last_analysis.mch;#}
+                            {#if (data.last_analysis.mchc)#}
+                            {#    document.getElementById('mchc').value = data.last_analysis.mchc;#}
                         }
                     })
                     .catch(error => {
