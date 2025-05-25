@@ -572,6 +572,7 @@
             startDateInput.addEventListener('change', function() {
                 if (this.value) {
                     endDateInput.disabled = true;
+                    endDateInput.value = '';
                 } else {
                     endDateInput.disabled = false;
                 }
@@ -580,6 +581,7 @@
             endDateInput.addEventListener('change', function() {
                 if (this.value) {
                     startDateInput.disabled = true;
+                    startDateInput.value = '';
                 } else {
                     startDateInput.disabled = false;
                 }
@@ -1100,7 +1102,7 @@
             const defaultDateTime = defaultDate.toISOString().slice(0, 16); // Формат YYYY-MM-DDTHH:MM
             
             const oneMonthAgo = new Date(defaultDate);
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 7);
             const oneMonthAgoDateTime = oneMonthAgo.toISOString().slice(0, 16);
             
             startDateInput.value = oneMonthAgoDateTime;
